@@ -2,11 +2,11 @@
 
 Supported backends: 
 
-  SVG file
+  [SVG](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics) file
   
-  HBITMAP (MSW) 
+  [HBITMAP] (https://docs.microsoft.com/en-us/windows/desktop/api/windef/index) (MSW) 
   
-  HDC     (MSW) 
+  [HDC](https://docs.microsoft.com/en-us/windows/desktop/api/windef/index)     (MSW) 
   
   
  Compatibility: C++17 standard
