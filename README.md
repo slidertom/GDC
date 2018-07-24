@@ -12,8 +12,8 @@ Stateless drawings. GDCPaint must be provided for the any drawing function.
 Similar approach as [Skia](https://skia.org/) does. Skia was too heavy and a bit limited for the [svg groups](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/g) support.
 
  Dependencies:
- SVG - <fstream>
- HBITMAP, HDC - GDI ([oligdi.h](https://www.codeproject.com/Articles/12689/Alternative-to-MFC-for-GDI-programming) wrapper by Olivier Langlois), [GDI+](https://docs.microsoft.com/en-us/windows/desktop/gdiplus/-gdiplus-gdi-start).
+ * SVG backend contains dependency on the [<fstream>](http://www.cplusplus.com/reference/fstream/fstream/).
+ * HBITMAP, HDC backend contains dependencies on the GDI ([oligdi.h](https://www.codeproject.com/Articles/12689/Alternative-to-MFC-for-GDI-programming) wrapper by Olivier Langlois) and [GDI+](https://docs.microsoft.com/en-us/windows/desktop/gdiplus/-gdiplus-gdi-start).
 
 Expected usage area: same drawing code for the svg output and on screen drawings.
 
