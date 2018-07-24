@@ -16,7 +16,7 @@ Similar approach as SKIA does
 
  Dependencies:
  SVG - <fstream>
- HBITMAP, HDC - GDI (oligdi.h wrapper by Olivier Langlois), gdi plus
+ HBITMAP, HDC - GDI ([oligdi.h](https://www.codeproject.com/Articles/12689/Alternative-to-MFC-for-GDI-programming) wrapper by Olivier Langlois), gdi plus
 
 Expected usage area: same drawing code for the svg output and on screen drawings.
 
