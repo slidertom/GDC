@@ -21,5 +21,5 @@ Similar approach as SKIA does
 Expected usage area: same drawing code for the svg output and on screen drawings.
 
 It's a good replacement for the MFC CDC class. GDC contains similar interface as CDC,
-but no dependencies on the MFC toolkit.
+but no dependencies on the [MFC](https://en.wikipedia.org/wiki/Microsoft_Foundation_Class_Library) toolkit.
 
