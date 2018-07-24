@@ -10,7 +10,7 @@
     #define new DEBUG_NEW
 #endif
 
-const double SVG_PI	=	3.1415926535897932384626433832795;
+const double SVG_PI	= 3.1415926535897932384626433832795;
 
 class CSvgFileAbs
 {
