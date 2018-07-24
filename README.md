@@ -9,7 +9,7 @@ Supported backends:
  Compatibility: C++17 standard
 
 Stateless drawings. GDCPaint must be provided for the any drawing function.
-Similar approach as SKIA does
+Similar approach as [Skia](https://skia.org/) does. Skia was too heavy and a bit limited for the (svg groups)[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/g] support.
 
  Dependencies:
  SVG - <fstream>
