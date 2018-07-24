@@ -326,7 +326,7 @@ class GDC_UTIL_API GDCSvg
 {
 // Construction/Destruction
 public:
-	GDCSvg(const wchar_t *sFilePath, int32_t width, int32_t height);
+    GDCSvg(const wchar_t *sFilePath, int32_t width, int32_t height);
     GDCSvg(std::string *pBuffer, int32_t width, int32_t height);
     ~GDCSvg();
 

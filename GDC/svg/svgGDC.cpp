@@ -3,14 +3,13 @@
 
 #include "../GDC.h" 
 
-#include "memory"
 #include "fstream"
 
 #ifdef _DEBUG
     #define new DEBUG_NEW
 #endif
 
-const double SVG_PI	= 3.1415926535897932384626433832795;
+const double SVG_PI	=	3.1415926535897932384626433832795;
 
 class CSvgFileAbs
 {
@@ -873,5 +872,5 @@ void SvgGDC::EndGroup()
 
 void SvgGDC::DrawTextByEllipse(double dRadiusX, double dRadiusY, const GDCPoint &ptCenter, const wchar_t *sText, double dEllipseAngleRad, const GDCPaint &paint)
 {
-    
+    //
 }
