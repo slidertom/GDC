@@ -6,11 +6,11 @@
 #include "memory"
 #include "fstream"
 
-#include "Collections/MxKMacros.h"
-
 #ifdef _DEBUG
     #define new DEBUG_NEW
 #endif
+
+const double SVG_PI	=	3.1415926535897932384626433832795;
 
 class CSvgFileAbs
 {
@@ -659,11 +659,11 @@ void SvgGDC::DrawHollowOval(int32_t xCenter, int32_t yCenter, int32_t rx, int32_
 
 void SvgGDC::DrawArc(int32_t x, int32_t y, const int32_t nRadius, const float fStartAngle, const float fSweepAngle, const GDCPaint &paint) 
 {
-	const int32_t x1 = int32_t(x + nRadius * (::cos(-fStartAngle * PI / 180.0)));
-	const int32_t y1 = int32_t(y + nRadius * (::sin(-fStartAngle * PI / 180.0)));
+	const int32_t x1 = int32_t(x + nRadius * (::cos(-fStartAngle * SVG_PI / 180.0)));
+	const int32_t y1 = int32_t(y + nRadius * (::sin(-fStartAngle * SVG_PI / 180.0)));
 
-	const int32_t x2 = int32_t(x + nRadius * (::cos(-fSweepAngle * PI / 180.0)));
-	const int32_t y2 = int32_t(y + nRadius * (::sin(-fSweepAngle * PI / 180.0)));
+	const int32_t x2 = int32_t(x + nRadius * (::cos(-fSweepAngle * SVG_PI / 180.0)));
+	const int32_t y2 = int32_t(y + nRadius * (::sin(-fSweepAngle * SVG_PI / 180.0)));
 
 	std::string sLine = "<path d=\"";
 	sLine += "M" + std::to_string(x) + " " + std::to_string(y);   // Move to center
@@ -873,5 +873,5 @@ void SvgGDC::EndGroup()
 
 void SvgGDC::DrawTextByEllipse(double dRadiusX, double dRadiusY, const GDCPoint &ptCenter, const wchar_t *sText, double dEllipseAngleRad, const GDCPaint &paint)
 {
-    //
+    
 }

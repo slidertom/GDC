@@ -6,7 +6,7 @@ set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "")
 set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "")
 
 get_filename_component(RootDir "${CMAKE_CURRENT_LIST_DIR}" PATH)
-get_filename_component(RootDir "${RootDir}" PATH)
+#get_filename_component(RootDir "${RootDir}" PATH)
 
 function(include_dir relativePath)
 	include_directories("${RootDir}/${relativePath}")
@@ -194,7 +194,7 @@ function(set_project_definitions)
 	add_definitions(/Zi)
 
 	#Multi process compilation (currently default and cpu2 supported)
-    IF(EXISTS "${RootDir}/Tools/CMake/cpu2")
+    IF(EXISTS "${RootDir}/cpu2")
         add_definitions(/MP2)  
     ELSE()
         add_definitions(/MP)

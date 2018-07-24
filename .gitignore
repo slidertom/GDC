@@ -1,6 +1,11 @@
 *.sln
 *.vcxproj
 *.filters
+*.user
 GDC/CMakeFiles/*
 CMakeCache.txt
 cmake_install.cmake
+GDC/GDC.dir/*
+GDC/.vs/*
+bin/*
+lib/*
