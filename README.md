@@ -1,11 +1,8 @@
 # GDC - Graphical Draw Context
 
 Supported backends: 
-
   [SVG](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics) file
-  
-  [HBITMAP] (https://docs.microsoft.com/en-us/windows/desktop/api/windef/index) (MSW) 
-  
+  [HBITMAP](https://docs.microsoft.com/en-us/windows/desktop/api/windef/index) (MSW) 
   [HDC](https://docs.microsoft.com/en-us/windows/desktop/api/windef/index)     (MSW) 
   
   
