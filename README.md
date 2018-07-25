@@ -1,4 +1,6 @@
-# GDC - Graphical Draw Context
+## GDC - Graphical Draw Context
+
+svg, bitmap and screen based output/render.
 
 Supported backends: 
   * [SVG](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics) file
