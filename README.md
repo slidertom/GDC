@@ -1,5 +1,4 @@
 ## GDC - Graphical Draw Context
-
 svg, bitmap and screen based output/render.
 
 Supported backends: 
