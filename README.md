@@ -21,3 +21,9 @@ It's a good replacement for the [MFC CDC](https://msdn.microsoft.com/en-us/libra
 but no dependencies on the [MFC](https://en.wikipedia.org/wiki/Microsoft_Foundation_Class_Library) toolkit. Due the oligdi.h
 usage GDC performs better than CDC.
 
+Samples: 
+```C++
+int32_t nHorzSize = 500;
+int32_t nVertSize = 500;
+GDCSvg svg(L"test.html", nHorzSize, nVertSize);
+GDC gdc(svg);
