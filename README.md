@@ -27,3 +27,19 @@ int32_t nHorzSize = 500;
 int32_t nVertSize = 500;
 GDCSvg svg(L"test.html", nHorzSize, nVertSize);
 GDC gdc(svg);
+
+GDCPaint stroke;
+stroke.SetColor(RGB(255, 0, 0));
+stroke.SetStrokeType(GDC_PS_DASH);
+
+GDCPaint brush;
+brush.SetPaintType(GDC_FILL);
+brush.SetColor(RGB(255, 255, 255));
+
+std::vector<GDCPoint> points;
+points.push_back(GDCPoint(0,    0));
+points.push_back(GDCPoint(100,  0));
+points.push_back(GDCPoint(100, 100));
+points.push_back(GDCPoint(0, 100));
+
+gdc.DrawPolygon(points, brush, stroke);
