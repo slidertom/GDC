@@ -8,6 +8,10 @@
 #include "MswPaint.h"
 
 #include "gdi_plus_util.h"
+#include "TextUtils/GdiPlusTextDrawUtils.h"
+
+#include "../../GDC/msw/gdi_plus_inc//GdiPlus.h"
+
 
 #include "memory"
 
@@ -15,13 +19,29 @@
     #define new DEBUG_NEW
 #endif
 
-static inline LOGFONT *CreateDefLogFont()
+namespace internal
 {
-    LOGFONT *pLF = new LOGFONT;
-    memset(pLF, 0, sizeof(LOGFONT));
-	::wcscpy(pLF->lfFaceName, L"Arial");
-    pLF->lfWeight = FW_NORMAL;
-    return pLF;
+    static inline LOGFONT *CreateDefLogFont()
+    {
+        LOGFONT *pLF = new LOGFONT;
+        memset(pLF, 0, sizeof(LOGFONT));
+        ::wcscpy(pLF->lfFaceName, L"Arial");
+        pLF->lfWeight = FW_NORMAL;
+        return pLF;
+    }
+
+    static Gdiplus::Point *GdcPoly2GdiPlus(const std::vector<GDCPoint> &mx_poly)
+    {
+        const size_t nCnt = mx_poly.size();
+        ASSERT(nCnt > 0);
+        Gdiplus::Point *points = new Gdiplus::Point[nCnt];
+        for (size_t i1 = 0; i1 < nCnt; ++i1) {
+            points[i1].X = mx_poly[i1].x;
+            points[i1].Y = mx_poly[i1].y;
+        }
+
+        return points;
+    }
 }
 
 
@@ -173,7 +193,7 @@ public:
         if ( !pPaint->m_pFont ) {
             pPaint->m_pFont = new OFont;
             if ( !pPaint->m_pLF ) {
-                pPaint->m_pLF = CreateDefLogFont();
+                pPaint->m_pLF = internal::CreateDefLogFont();
             }
             VERIFY(pPaint->m_pFont->CreateFontIndirect(pPaint->m_pLF));
         }
@@ -207,6 +227,41 @@ public:
 	    pDC->SetBkMode(TRANSPARENT);
 	    pDC->SetTextColor(paint.m_color);
     }
+
+    // Binary raster class
+public:
+    class CBinaryRaster
+    {
+    public:
+        CBinaryRaster(ODC *pDC, const GDCPaint &paint)
+        :m_pDC(pDC)
+        {
+            switch (paint.GetRasterType())
+            {
+                case GDC_R2_NOTXORPEN:
+                    m_nOldDrawMode = pDC->SetROP2(R2_NOTXORPEN);
+                    break;
+                case GDC_R2_XORPEN:
+                    m_nOldDrawMode = pDC->SetROP2(R2_XORPEN);
+                    break;
+                case GDC_R2_NONE:
+                default:
+                    break;
+            }
+        }
+
+        ~CBinaryRaster()
+        {
+            if (m_nOldDrawMode != -1) {
+                m_pDC->SetROP2(m_nOldDrawMode);
+            }
+        }
+
+    private:
+        int32_t m_nOldDrawMode {-1};
+        ODC *m_pDC;
+    };
+
 };
 
 namespace ODCToGDCPlusUtils
@@ -302,6 +357,7 @@ void CMswGDC::DrawLine(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDC
     }
 
     ODCInit::SelectStrokePaint(m_pDC, paint);
+    ODCInit::CBinaryRaster rop2(m_pDC, paint);
 
     m_pDC->MoveTo(x1, y1);
     m_pDC->LineTo(x2, y2);
@@ -310,8 +366,8 @@ void CMswGDC::DrawLine(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDC
 void CMswGDC::DrawPolygon(const std::vector<GDCPoint> &points, const GDCPaint &fill_paint, const GDCPaint &stroke_paint)
 {
     ODCInit::SelectStrokePaint(m_pDC, stroke_paint);
-
     ODCInit::SelectFillPaint(m_pDC, fill_paint);
+    ODCInit::CBinaryRaster rop2(m_pDC, fill_paint);
 
     int32_t nCnt = (int32_t)points.size();
     POINT *pPoints = new POINT[points.size()];
@@ -335,6 +391,7 @@ void CMswGDC::DrawPoly(const std::vector<GDCPoint> &points, const GDCPaint &stro
     }
 
     ODCInit::SelectStrokePaint(m_pDC, stroke_paint);
+    ODCInit::CBinaryRaster rop2(m_pDC, stroke_paint);
 
     const GDCPoint &pt = points.front();
     m_pDC->MoveTo(pt);
@@ -357,6 +414,7 @@ void CMswGDC::DrawPolygonTransparent(const std::vector<GDCPoint> &points, const 
         point.y = pt.y;
         points2.push_back(point);
     }
+
     CGdiPlusUtil::DrawPolygonTransparent(m_pDC->GetSafeHdc(), points2, alfa, 
                                          (unsigned char)GetRValue(color), (unsigned char)GetGValue(color), (unsigned char)GetBValue(color)); 
 
@@ -399,9 +457,62 @@ void CMswGDC::DrawPolygonGradient(const std::vector<GDCPoint> &points, const GDC
                              (unsigned char)GetRValue(colorTo), (unsigned char)GetGValue(colorTo), (unsigned char)GetBValue(colorTo));
 }
 
+void CMswGDC::DrawPolygonTexture(const std::vector<GDCPoint> &points, const wchar_t * sTexturePath, double dAngle, float fZoom)
+{
+    const BOOL useEmbeddedColorManagement = FALSE;
+    Gdiplus::Image* pImage = Gdiplus::Image::FromFile(sTexturePath, useEmbeddedColorManagement);
+    if (pImage && pImage->GetLastStatus() != Gdiplus::Ok) {
+        return;
+    }
+
+    const Gdiplus::Point *gdi_points = internal::GdcPoly2GdiPlus(points);
+
+    Gdiplus::TextureBrush brush(pImage, Gdiplus::WrapModeTile);
+    brush.ScaleTransform(fZoom, fZoom);
+    brush.RotateTransform((float) dAngle);
+    brush.TranslateTransform((float) gdi_points[0].X, (float) gdi_points[0].Y, Gdiplus::MatrixOrderAppend);
+
+    const size_t nCnt = points.size();
+    Gdiplus::Graphics dc(GetHDC());
+    dc.FillPolygon(&brush, gdi_points, (int32_t)nCnt); 
+
+    delete[] gdi_points;
+}
+
+void CMswGDC::DrawPolygonTexture(const std::vector<GDCPoint> &points, const std::vector<GDCPoint> &points_exclude, const wchar_t * sTexturePath, double dAngle, float fZoom)
+{
+    const BOOL useEmbeddedColorManagement = FALSE;
+    Gdiplus::Image* pImage = Gdiplus::Image::FromFile(sTexturePath, useEmbeddedColorManagement);
+    if (pImage && pImage->GetLastStatus() != Gdiplus::Ok) {
+        return;
+    }
+
+    const Gdiplus::Point *gdi_points_include = internal::GdcPoly2GdiPlus(points);
+    const Gdiplus::Point *gdi_points_exclude = internal::GdcPoly2GdiPlus(points_exclude);
+
+    Gdiplus::TextureBrush brush(pImage, Gdiplus::WrapModeTile);
+    brush.ScaleTransform(fZoom, fZoom);
+    brush.RotateTransform((float) dAngle);
+    brush.TranslateTransform((float) gdi_points_include[0].X, (float) gdi_points_include[0].Y, Gdiplus::MatrixOrderAppend);
+
+    Gdiplus::GraphicsPath path_include, path_exclude;
+    path_include.AddPolygon(gdi_points_include, (int)points.size());
+    path_exclude.AddPolygon(gdi_points_exclude, (int)points.size());
+
+    Gdiplus::Region region(&path_include);
+    region.Exclude(&path_exclude);
+
+    Gdiplus::Graphics dc(GetHDC());
+    dc.FillRegion(&brush, &region);
+
+    delete[] gdi_points_include;
+    delete[] gdi_points_exclude;
+}
+
 void CMswGDC::DrawPolyLine(const std::vector<GDCPoint> &points, const GDCPaint &stroke_paint)
 {
     ODCInit::SelectStrokePaint(m_pDC, stroke_paint);
+    ODCInit::CBinaryRaster rop2(m_pDC, stroke_paint);
 
     const GDCPoint &pt = points.front();
     m_pDC->MoveTo(pt);
@@ -415,6 +526,7 @@ void CMswGDC::DrawPoint(int32_t x, int32_t y, const GDCPaint &paint)
 {
     // not correct implementation -> Ellipse has to be used(!)
     ODCInit::SelectStrokePaint(m_pDC, paint);
+    ODCInit::CBinaryRaster rop2(m_pDC, paint);
     m_pDC->MoveTo(x, y);
 	m_pDC->LineTo(x, y);
 }
@@ -422,6 +534,7 @@ void CMswGDC::DrawPoint(int32_t x, int32_t y, const GDCPaint &paint)
 void CMswGDC::DrawFilledRectangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &fill_paint)
 {
     ODCInit::SelectFillPaint(m_pDC, fill_paint);
+    ODCInit::CBinaryRaster rop2(m_pDC, fill_paint);
     m_pDC->Rectangle(x1, y1, x2, y2);
 }
 
@@ -431,6 +544,8 @@ void CMswGDC::DrawRectangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, cons
     //Force to draw only line, no fill.
 	OBrush brush(NULL_BRUSH);
 	m_pDC->SelectObject(&brush);
+
+    ODCInit::CBinaryRaster rop2(m_pDC, stroke_paint);
 
     m_pDC->Rectangle(x1, y1, x2, y2);
 }
@@ -443,18 +558,22 @@ void CMswGDC::DrawEllipse(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const 
 	OBrush brush(NULL_BRUSH);
 	m_pDC->SelectObject(&brush);
 
-	m_pDC->Ellipse(x1, y1, x2, y2);
+    ODCInit::CBinaryRaster rop2(m_pDC, paint);
+    
+    m_pDC->Ellipse(x1, y1, x2, y2);
 }
 
 void CMswGDC::DrawFilledEllipse(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &paint)
 {
 	ODCInit::SelectFillPaint(m_pDC, paint);
+    ODCInit::CBinaryRaster rop2(m_pDC, paint);
 	m_pDC->Ellipse(x1, y1, x2, y2);
 }
 
 void CMswGDC::DrawHollowOval(int32_t xCenter, int32_t yCenter, int32_t rx, int32_t ry, int32_t h, const GDCPaint &fill_paint)
 {
 	OBrush *pBrush = ODCInit::SelectFillPaint(m_pDC, fill_paint);
+    ODCInit::CBinaryRaster rop2(m_pDC, fill_paint);
 
 	if (pBrush) {
 		ORgn rgnO;
@@ -470,6 +589,8 @@ void CMswGDC::DrawHollowOval(int32_t xCenter, int32_t yCenter, int32_t rx, int32
 void CMswGDC::DrawArc(int32_t x, int32_t y, const int32_t nRadius, const float fStartAngle, const float fSweepAngle, const GDCPaint &paint)
 {
 	ODCInit::SelectStrokePaint(m_pDC, paint);
+    ODCInit::CBinaryRaster rop2(m_pDC, paint);
+
 	m_pDC->MoveTo(x, y);
 	::AngleArc(m_pDC->GetSafeHdc(), x, y, nRadius, fStartAngle, fSweepAngle);
 	m_pDC->LineTo(x, y);
@@ -551,7 +672,12 @@ CMswGDC::CMswGDC(HWND hwnd)
     m_pDC = new ODC(hDC, TRUE);
 }
 
-void CMswGDC::DrawTextByEllipse(double dRadiusX, double dRadiusY, const GDCPoint &ptCenter, const wchar_t *sText, double dEllipseAngleRad, const GDCPaint &paint)
+void CMswGDC::DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, const wchar_t *sText, bool bAllignBottom, double dEllipseAngleRad, const GDCPaint &paint)
 {
-    //
+    CGdiPlusTextDrawUtils::DrawTextByEllipse(m_pDC->GetSafeHdc(), paint, dCenterAngle, nRadiusX, nRadiusY, xCenter, yCenter, sText, bAllignBottom, dEllipseAngleRad);
+}
+
+void CMswGDC::DrawTextByCircle(double dCenterAngle, int32_t nRadius, int32_t nCX, int32_t nCY, const wchar_t *sText, bool bAllignBottom, bool bRevertTextDir, const GDCPaint &paint)
+{
+    CGdiPlusTextDrawUtils::DrawTextByCircle(m_pDC->GetSafeHdc(), paint, dCenterAngle, nRadius, nCX, nCY, sText, bAllignBottom, bRevertTextDir);
 }

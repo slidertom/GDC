@@ -32,6 +32,13 @@ class OPen;
 class OBrush;
 class OFont;
 
+enum GDCRasterType
+{
+    GDC_R2_NONE = 0,
+    GDC_R2_XORPEN = 1,
+    GDC_R2_NOTXORPEN = 2,
+};
+
 enum GDCStrokeType
 {
     GDC_PS_SOLID       = 0,
@@ -85,11 +92,15 @@ public:
 	GDCFontDescr(const GDCFontDescr &font_descr);
     ~GDCFontDescr() { }
 
+    //Operators
+public:
+    GDCFontDescr &operator=(const GDCFontDescr &x);
+
 // Attributes
 public:
     float m_fAngle {0.};
     std::wstring m_sFontName;
-    GDCFontWeight m_weight;
+    GDCFontWeight m_weight {GDC_FW_NORMAL};
     int32_t m_nHeight;
     int32_t m_nSlant;
 	int32_t m_nUnderline;
@@ -122,6 +133,9 @@ public:
     void SetPaintType(GDCPaintType type);
     GDCPaintType GetPaintType() const;
 
+    void SetRasterType(GDCRasterType type);
+    GDCRasterType GetRasterType() const { return  m_raster_type; }
+
     void SetTextSize(int32_t nSize); // has to be deleted -> user has to create different paints
     void SetTextAlign(int32_t nAlign);
     void SetTextOrientation(float fAngle);
@@ -139,13 +153,14 @@ private:
     GDCStrokeType m_stroke_type {GDC_PS_SOLID};
     GDCPaintType  m_paint_type  {GDC_STROKE};
     GDCFontDescr *m_pFontDescr  {nullptr};
+    GDCRasterType m_raster_type {GDC_R2_NONE};
 };
 
 class GDCPoint 
 {
 // Construction/Destruction
 public:
-    GDCPoint() : x(0), y(0) { }
+    GDCPoint() { }
     GDCPoint(const GDCPoint &pt) : x(pt.x), y(pt.y) { }
     GDCPoint(int32_t src_x, int32_t src_y) : x(src_x), y(src_y) { }
     ~GDCPoint() { }
@@ -165,25 +180,39 @@ public:
 
 // Attributes
 public:
-    int32_t x; // maybe float or double ?
-    int32_t y; // maybe float or double ?
+    int32_t x {0}; // maybe float or double ?
+    int32_t y {0}; // maybe float or double ?
 };
 
 class GDCSize
 {
 // Construction/Destruction
 public:
-    GDCSize() : cx(0), cy(0) { } 
+    GDCSize() { } 
     GDCSize(int32_t x, int32_t y) : cx(x), cy(y) { }
     ~GDCSize() { }
 
 // Attributes
 public:
-    int32_t cx;
-    int32_t cy;
+    int32_t cx {0};
+    int32_t cy {0};
 };
 
 #include "vector"
+
+template <class TPoint, typename FnConversion>
+inline std::vector<GDCPoint> Poly2Gdc(const std::vector<TPoint>& src_poly, FnConversion fnConversion)
+{
+    std::vector<GDCPoint> gdc_poly;
+    gdc_poly.reserve(src_poly.size());
+    GDCPoint gdc_pt;
+    for (const TPoint &src_pt : src_poly) {
+        gdc_pt = fnConversion(src_pt);
+        gdc_poly.push_back(gdc_pt);
+    }
+    return gdc_poly;
+}
+
 /*
 class GDC_UTIL_API GDCPath
 {
@@ -237,6 +266,8 @@ public:
     // special case -> avoid if statements in the general drawings
     void DrawPolygonTransparent(const std::vector<GDCPoint> &points, const GDCPaint &fill_paint);
 	void DrawPolygonGradient(const std::vector<GDCPoint> &points, const GDCPaint &paintFrom, const GDCPaint &paintTo);
+	void DrawPolygonTexture(const std::vector<GDCPoint> &points, const wchar_t * sTexturePath, double dAngle, float fZoom);
+	void DrawPolygonTexture(const std::vector<GDCPoint> &points, const std::vector<GDCPoint> &points_exclude, const wchar_t * sTexturePath, double dAngle, float fZoom);
 
     void DrawFilledRectangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &fill_paint);
     template <class TRect>
@@ -276,6 +307,9 @@ public:
         
     void TextOut(const wchar_t *sText, int32_t x, int32_t y, const GDCPaint &paint);
     void TextOutRect(const wchar_t *sText, const RECT &rect, const GDCPaint &paint);
+
+    void DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, const wchar_t *sText, bool bAllignBottom, double dEllipseAngleRad, const GDCPaint &paint);
+    void DrawTextByCircle(double dCenterAngle, int32_t nRadius, int32_t nCX, int32_t nCY, const wchar_t *sText, bool bAllignBottom, bool bRevertTextDir, const GDCPaint &paint);
 
     // The height (ascent + descent) of characters.
     int32_t GetTextHeight(const GDCPaint &paint) const;
@@ -326,8 +360,11 @@ class GDC_UTIL_API GDCSvg
 {
 // Construction/Destruction
 public:
-    GDCSvg(const wchar_t *sFilePath, int32_t width, int32_t height);
-    GDCSvg(std::string *pBuffer, int32_t width, int32_t height);
+    // if bAutoSize -> true  -> image size: 100%x100%
+    // if bAutoSize -> false -> image size: width x height
+    // width and height are used for the viewbox
+    GDCSvg(const wchar_t *sFilePath, int32_t width, int32_t height, bool bAutoSize);
+    GDCSvg(std::string *pBuffer, int32_t width, int32_t height, bool bAutoSize);
     ~GDCSvg();
 
 // Operations
@@ -335,14 +372,19 @@ public:
     int32_t Width() const  { return m_nWidth;  }
     int32_t Height() const { return m_nHeight; }
     const wchar_t *GetFilePath() const { return m_sFilePath.c_str(); }
+    // if multiple svg images are going to be shown in the one html page
+    // gradient id's must be unique
+    void SetPrefix(const char *sPrefix);
 
 // Attributes
 private:
     friend class GDC;
     int32_t m_nWidth;
     int32_t m_nHeight;
+    bool m_bAutoSize {false};
     std::wstring m_sFilePath;
-    std::string *m_pBuffer;
+    std::string *m_pBuffer {nullptr};
+    std::string m_sPrefix;
 };
 
 #endif

@@ -9,7 +9,7 @@
 class ODC;
 class GDCBitmap;
 
-class CMswGDC : public CAbsGDC
+class CMswGDC final : public CAbsGDC
 {
 // Construction/Destruction
 public:
@@ -32,6 +32,8 @@ public:
     
     virtual void DrawPolygonTransparent(const std::vector<GDCPoint> &points, const GDCPaint &fill_paint) override;
 	virtual void DrawPolygonGradient(const std::vector<GDCPoint> &points, const GDCPaint &paintFrom, const GDCPaint &paintTo) override;
+    virtual void DrawPolygonTexture(const std::vector<GDCPoint> &points, const wchar_t * sTexturePath, double dAngle, float fZoom) override;
+    virtual void DrawPolygonTexture(const std::vector<GDCPoint> &points, const std::vector<GDCPoint> &points_exclude, const wchar_t * sTexturePath, double dAngle, float fZoom) override;
 
     virtual void DrawFilledRectangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &fill_paint) override;
     virtual void DrawRectangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &stroke_paint) override;
@@ -44,7 +46,8 @@ public:
     virtual void DrawBitmap(HBITMAP hBitmap, int32_t x, int32_t y) override; 
         
     virtual void TextOut(const wchar_t *sText, int32_t x, int32_t y, const GDCPaint &paint) override;
-    virtual void DrawTextByEllipse(double dRadiusX, double dRadiusY, const GDCPoint &ptCenter, const wchar_t *sText, double dEllipseAngleRad, const GDCPaint &paint) override;
+    virtual void DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, const wchar_t *sText, bool bAllignBottom, double dEllipseAngleRad, const GDCPaint &paint) override;
+    virtual void DrawTextByCircle(double dCenterAngle, int32_t nRadius, int32_t nCX, int32_t nCY, const wchar_t *sText, bool bAllignBottom, bool bRevertTextDir, const GDCPaint &paint) override;
 
     // The height (ascent + descent) of characters.
     virtual int32_t GetTextHeight(const GDCPaint &paint) const override;

@@ -9,7 +9,7 @@
     #define new DEBUG_NEW
 #endif
 
-const double SVG_PI	=	3.1415926535897932384626433832795;
+const double SVG_PI	= 3.1415926535897932384626433832795;
 
 class CSvgFileAbs
 {
@@ -33,10 +33,10 @@ public:
         #ifdef _DEBUG // currently only for the debug
         m_sFileName = sFilePath;
         wchar_t drive[_MAX_DRIVE];
-	    wchar_t dir[_MAX_DIR];
-	    wchar_t fname[_MAX_FNAME];
-	    wchar_t ext[_MAX_EXT];
-	    ::_wsplitpath(m_sFileName.c_str(), drive, dir, fname, ext);
+        wchar_t dir[_MAX_DIR];
+        wchar_t fname[_MAX_FNAME];
+        wchar_t ext[_MAX_EXT];
+        ::_wsplitpath(m_sFileName.c_str(), drive, dir, fname, ext);
         if ( ::wcscmp(ext, L".html") == 0) {
             *m_pFile << "<html>";
         }
@@ -45,10 +45,10 @@ public:
     virtual ~CSvgFile() {
         #ifdef _DEBUG // currently only for the debug
         wchar_t drive[_MAX_DRIVE];
-	    wchar_t dir[_MAX_DIR];
-	    wchar_t fname[_MAX_FNAME];
-	    wchar_t ext[_MAX_EXT];
-	    ::_wsplitpath(m_sFileName.c_str(), drive, dir, fname, ext);
+        wchar_t dir[_MAX_DIR];
+        wchar_t fname[_MAX_FNAME];
+        wchar_t ext[_MAX_EXT];
+        ::_wsplitpath(m_sFileName.c_str(), drive, dir, fname, ext);
         if ( ::wcscmp(ext, L".html") == 0) {
             *m_pFile << "</html>";
         }
@@ -91,19 +91,22 @@ private:
     std::string *m_pBuffer;
 };
 
-SvgGDC::SvgGDC(const wchar_t *sFilePath, int32_t nWidth, int32_t nHeight)
+SvgGDC::SvgGDC(const wchar_t *sFilePath, int32_t nWidth, int32_t nHeight, bool bAutoSize, const char *sPrefix)
 {
-    m_pFile = new CSvgFile(sFilePath);
-    
-    m_nWidth  = nWidth;
-    m_nHeight = nHeight;
+    m_pFile     = new CSvgFile(sFilePath);
+    m_nWidth    = nWidth;
+    m_nHeight   = nHeight;
+    m_bAutoSize = bAutoSize;
+    m_sPrefix   = sPrefix;
 }
 
-SvgGDC::SvgGDC(std::string *pBuffer, int32_t nWidth, int32_t nHeight)
+SvgGDC::SvgGDC(std::string *pBuffer, int32_t nWidth, int32_t nHeight, bool bAutoSize, const char *sPrefix)
 {
-    m_pFile = new CSvgBuffer(pBuffer);
-    m_nWidth  = nWidth;
-    m_nHeight = nHeight;
+    m_pFile     = new CSvgBuffer(pBuffer);
+    m_nWidth    = nWidth;
+    m_nHeight   = nHeight;
+    m_bAutoSize = bAutoSize;
+    m_sPrefix   = sPrefix;
 }
 
 SvgGDC::~SvgGDC()
@@ -313,26 +316,22 @@ static inline std::string Stroke(const GDCPaint &paint)
     {
     case GDC_PS_SOLID:
         break;
-    case GDC_PS_DASH:
-        {
+    case GDC_PS_DASH: {
             str += ";";
             str += "stroke-dasharray:20,10";
         }
         break;
-    case GDC_PS_DOT:
-        {
+    case GDC_PS_DOT: {
             str += ";";
             str += "stroke-dasharray:5,5";
         }
         break;
-    case GDC_PS_DASHDOT:
-        {
+    case GDC_PS_DASHDOT: {
             str += ";";
             str += "stroke-dasharray:20,5,5,5"; // stroke-length, space-length, stroke-length, ...
         }
         break;
-	case GDC_PS_DASHDOTDOT:
-		{
+    case GDC_PS_DASHDOTDOT: {
             str += ";";
             str += "stroke-dasharray:20,5,5,5,5,5"; // stroke-length, space-length, stroke-length, ...
         }
@@ -345,10 +344,10 @@ inline static std::string CreatePatern(const char *sColor, const char *sPaternNa
 {
     std::string sValue = "<defs>";
         sValue += "<pattern id=\""; sValue += sPaternName; sValue += "\" patternUnits=\"userSpaceOnUse\" width=\"10\" height=\"10\">";
-			sValue += "<svg width='10' height='10'>";
-			sValue += "<rect width='10' height='10' fill='none'/>";
-				sValue += "<path d='";  sValue += sPaternPath; sValue += "' stroke='"; sValue += sColor;  sValue += "' stroke-width='1'/> ";
-			sValue += "</svg>";
+            sValue += "<svg width='10' height='10'>";
+            sValue += "<rect width='10' height='10' fill='none'/>";
+                sValue += "<path d='";  sValue += sPaternPath; sValue += "' stroke='"; sValue += sColor;  sValue += "' stroke-width='1'/> ";
+            sValue += "</svg>";
         sValue += "</pattern>";
     sValue += "</defs>";
     return sValue;
@@ -356,32 +355,32 @@ inline static std::string CreatePatern(const char *sColor, const char *sPaternNa
 
 inline static std::string CreateBDiagPatern(const char *sColor, const char *sPaternName)
 {
-	return CreatePatern(sColor, sPaternName, "M-1,1 l2,-2 M0,10 l10,-10 M9,11 l2,-2");
+    return CreatePatern(sColor, sPaternName, "M-1,1 l2,-2 M0,10 l10,-10 M9,11 l2,-2");
 }
 
 inline static std::string CreateFDiagPatern(const char *sColor, const char *sPaternName)
 {
-	return CreatePatern(sColor, sPaternName, "M9,-1 l2,2 M0,0 l10,10 M-1,9 l2,2");
+    return CreatePatern(sColor, sPaternName, "M9,-1 l2,2 M0,0 l10,10 M-1,9 l2,2");
 }
 
 inline static std::string CreateDiagCrossPatern(const char *sColor, const char *sPaternName)
 {
-	return CreatePatern(sColor, sPaternName, "M0 0L10 10ZM10 0L0 10Z");
+    return CreatePatern(sColor, sPaternName, "M0 0L10 10ZM10 0L0 10Z");
 }
 
 inline static std::string CreateHorzPatern(const char *sColor, const char *sPaternName)
 {
-	return CreatePatern(sColor, sPaternName, "M0 1L10 1");
+    return CreatePatern(sColor, sPaternName, "M0 1L10 1");
 }
 
 inline static std::string CreateVertPatern(const char *sColor, const char *sPaternName)
 {
-	return CreatePatern(sColor, sPaternName, "M1 0L1 10");
+    return CreatePatern(sColor, sPaternName, "M1 0L1 10");
 }
 
 inline static std::string CreateCrossPatern(const char *sColor, const char *sPaternName)
 {
-	return CreatePatern(sColor, sPaternName, "M0 1L10 1M1 0L1 10");
+    return CreatePatern(sColor, sPaternName, "M0 1L10 1M1 0L1 10");
 }
 
 static inline std::string FillColor(const GDCPaint &paint)
@@ -395,74 +394,67 @@ static inline std::string FillPattern(const char *sPatternId)
 {
     std::string str  = "fill:url(#";
                 str += sPatternId;
-				str += ")";
+                str += ")";
     return str;
 }
 
 std::string SvgGDC::GetPattern(const GDCPaint &fill_paint)
 {
-	const GDCPaintType eFill = fill_paint.GetPaintType();
+    const GDCPaintType eFill = fill_paint.GetPaintType();
+    if (eFill <= GDC_FILL) {
+        return "";
+    }
 
-	if (eFill <= GDC_FILL) {
-		return "";
-	}
+    const COLORREF color = fill_paint.GetColor();
+    // Patterns with different colors support
+    std::string sPatternName = m_sPrefix;
+    sPatternName += std::to_string(eFill);
+    sPatternName += '-';
+    sPatternName += std::to_string(color);
 
-	const COLORREF color = fill_paint.GetColor();
+    auto it_find = std::find(m_patterns.begin(), m_patterns.end(), sPatternName);
+    if (m_patterns.end() != it_find) {
+        return sPatternName;
+    }
 
-	//Patterns with different colors support
-	std::string sPatternName = std::to_string(eFill);
-	sPatternName += '-';
-	sPatternName += std::to_string(color);
+    const std::string sColor = ColorToString(color);
+    std::string sPatternDef;
+    //If pattern doesn't exist - create and write to file
+    switch (eFill)
+    {
+    case GDC_FILL_DIAGCROSS: {
+            sPatternDef = CreateDiagCrossPatern(sColor.c_str(), sPatternName.c_str());
+        }
+        break;
+    case GDC_FILL_HORIZONTAL: {
+            sPatternDef = CreateHorzPatern(sColor.c_str(), sPatternName.c_str());
+        }
+        break;
+    case GDC_FILL_VERTICAL: {
+            sPatternDef = CreateVertPatern(sColor.c_str(), sPatternName.c_str());
+        }
+        break;
+    case GDC_FILL_FDIAGONAL: {
+            sPatternDef = CreateFDiagPatern(sColor.c_str(), sPatternName.c_str());
+        }
+        break;
+    case GDC_FILL_BDIAGONAL: {
+            sPatternDef = CreateBDiagPatern(sColor.c_str(), sPatternName.c_str());
+        }
+        break;
+    case GDC_FILL_CROSS: {
+            sPatternDef = CreateCrossPatern(sColor.c_str(), sPatternName.c_str());
+        }
+        break;
+    default:
+        return "";
+        break;
+    }
 
-	auto it_find = std::find(m_patterns.begin(), m_patterns.end(), sPatternName);
-	if (m_patterns.end() != it_find) {
-		return sPatternName;
-	}
+    m_patterns.push_back(sPatternName);
+    line(sPatternDef.c_str());
 
-	const std::string sColor = ColorToString(color);
-	std::string sPatternDef;
-	//If pattern doesn't exist - create and write to file
-	switch (eFill)
-	{
-	case GDC_FILL_DIAGCROSS:
-		{
-			sPatternDef = CreateDiagCrossPatern(sColor.c_str(), sPatternName.c_str());
-		}
-		break;
-	case GDC_FILL_HORIZONTAL:
-		{
-			sPatternDef = CreateHorzPatern(sColor.c_str(), sPatternName.c_str());
-		}
-		break;
-	case GDC_FILL_VERTICAL:
-		{
-			sPatternDef = CreateVertPatern(sColor.c_str(), sPatternName.c_str());
-		}
-		break;
-	case GDC_FILL_FDIAGONAL:
-		{
-			sPatternDef = CreateFDiagPatern(sColor.c_str(), sPatternName.c_str());
-		}
-		break;
-	case GDC_FILL_BDIAGONAL:
-		{
-			sPatternDef = CreateBDiagPatern(sColor.c_str(), sPatternName.c_str());
-		}
-		break;
-	case GDC_FILL_CROSS:
-		{
-			sPatternDef = CreateCrossPatern(sColor.c_str(), sPatternName.c_str());
-		}
-		break;
-	default:
-		return "";
-		break;
-	}
-
-	m_patterns.push_back(sPatternName);
-	line(sPatternDef.c_str());
-
-	return sPatternName;
+    return sPatternName;
 }
 
 void SvgGDC::DrawLine(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &paint) 
@@ -504,21 +496,21 @@ static inline std::string PointsToStr(const std::vector<GDCPoint> &points) {
 
 std::string SvgGDC::GetFill(const GDCPaint &fill_paint)
 {
-	const std::string sPatternName = GetPattern(fill_paint);
-	std::string sFill;
-	if (!sPatternName.empty()) {
-		sFill = FillPattern(sPatternName.c_str());
-	}
-	else {
-		sFill = FillColor(fill_paint);
-	}
+    const std::string sPatternName = GetPattern(fill_paint);
+    std::string sFill;
+    if (!sPatternName.empty()) {
+        sFill = ::FillPattern(sPatternName.c_str());
+    }
+    else {
+        sFill = ::FillColor(fill_paint);
+    }
 
-	return sFill;
+    return sFill;
 }
 
 void SvgGDC::DrawPolygon(const std::vector<GDCPoint> &points, const GDCPaint &fill_paint, const GDCPaint &stroke_paint) 
 {
-	const std::string sFill   = GetFill(fill_paint);
+    const std::string sFill   = GetFill(fill_paint);
     const std::string sPoints = PointsToStr(points);
     line("<polygon points=", sPoints.c_str(), " style=\"", sFill.c_str(), ";", Stroke(stroke_paint).c_str(), "\" />");
 }
@@ -552,6 +544,16 @@ inline static std::string CreateHorizontalGradient(const char *sColorFrom, const
     return sValue;
 }
 
+void SvgGDC::DrawPolygonTexture(const std::vector<GDCPoint> &points, const std::vector<GDCPoint> &points_exclude, const wchar_t * sTexturePath, double dAngle, float fZoom)
+{
+    ASSERT(FALSE); // implementation is missing - TODO
+}
+
+void SvgGDC::DrawPolygonTexture(const std::vector<GDCPoint> &points, const wchar_t * sTexturePath, double dAngle, float fZoom)
+{
+    ASSERT(FALSE); // implementation is missing - TODO
+}
+
 void SvgGDC::DrawPolygonGradient(const std::vector<GDCPoint> &points, const GDCPaint &paintFrom, const GDCPaint &paintTo) 
 {
     const COLORREF color_from = paintFrom.GetColor();
@@ -566,6 +568,7 @@ void SvgGDC::DrawPolygonGradient(const std::vector<GDCPoint> &points, const GDCP
     auto found = m_horizontal_grads.find(sGradColor);
     if ( found == m_horizontal_grads.end() ) {
         sGradId = "grad";
+        sGradId += m_sPrefix;
         sGradId += std::to_string(m_horizontal_grads.size() + 1);
         const std::string sGradient = ::CreateHorizontalGradient(sColorFrom.c_str(), sColorTo.c_str(), sGradId.c_str()); // do generate only once
         line(sGradient.c_str());
@@ -611,39 +614,39 @@ void SvgGDC::DrawRectangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const
 
 void SvgGDC::DrawEllipse(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &paint)
 {
-	const int32_t radius_x = int32_t(::abs(x2 - x1) * 0.5);
-	const int32_t radius_y = int32_t(::abs(y2 - y1) * 0.5);
+    const int32_t radius_x = int32_t(::abs(x2 - x1) * 0.5);
+    const int32_t radius_y = int32_t(::abs(y2 - y1) * 0.5);
 
-	const int32_t center_x = int32_t((x1 + x2) * 0.5);
-	const int32_t center_y = int32_t((y1 + y2) * 0.5);
+    const int32_t center_x = int32_t((x1 + x2) * 0.5);
+    const int32_t center_y = int32_t((y1 + y2) * 0.5);
 
-	std::string sLine = "<ellipse cx=\"";
-	sLine += std::to_string(center_x) + "\" cy=\"";
-	sLine += std::to_string(center_y) + "\" rx=\"";
-	sLine += std::to_string(radius_x) + "\" ry=\"";
-	sLine += std::to_string(radius_y) + "\"";
-	sLine += " style=\"fill:none;" + Stroke(paint);
-	sLine += "\"/>";
-	line(sLine.c_str());
+    std::string sLine = "<ellipse cx=\"";
+    sLine += std::to_string(center_x) + "\" cy=\"";
+    sLine += std::to_string(center_y) + "\" rx=\"";
+    sLine += std::to_string(radius_x) + "\" ry=\"";
+    sLine += std::to_string(radius_y) + "\"";
+    sLine += " style=\"fill:none;" + Stroke(paint);
+    sLine += "\"/>";
+    line(sLine.c_str());
 }
 
 void SvgGDC::DrawFilledEllipse(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &paint) 
 {
-	const int32_t radius_x = int32_t(::abs(x2-x1) * 0.5);
-	const int32_t radius_y = int32_t(::abs(y2-y1) * 0.5);
+    const int32_t radius_x = int32_t(::abs(x2-x1) * 0.5);
+    const int32_t radius_y = int32_t(::abs(y2-y1) * 0.5);
 
-	const int32_t center_x = int32_t((x1 + x2) * 0.5);
-	const int32_t center_y = int32_t((y1 + y2) * 0.5);
+    const int32_t center_x = int32_t((x1 + x2) * 0.5);
+    const int32_t center_y = int32_t((y1 + y2) * 0.5);
 
-	const std::string sFill = FillColor(paint);
-	std::string sLine = "<ellipse cx=\"";
-	sLine += std::to_string(center_x) + "\" cy=\"";
-	sLine += std::to_string(center_y) + "\" rx=\"";
-	sLine += std::to_string(radius_x) + "\" ry=\"";
-	sLine += std::to_string(radius_y) + "\"";
-	sLine += " style="+sFill+";" + Stroke(paint);
-	sLine += "\"/>";
-	line(sLine.c_str());
+    const std::string sFill = FillColor(paint);
+    std::string sLine = "<ellipse cx=\"";
+    sLine += std::to_string(center_x) + "\" cy=\"";
+    sLine += std::to_string(center_y) + "\" rx=\"";
+    sLine += std::to_string(radius_x) + "\" ry=\"";
+    sLine += std::to_string(radius_y) + "\"";
+    sLine += " style="+sFill+";" + Stroke(paint);
+    sLine += "\"/>";
+    line(sLine.c_str());
 }
 
 void SvgGDC::DrawHollowOval(int32_t xCenter, int32_t yCenter, int32_t rx, int32_t ry, int32_t h, const GDCPaint &fill_paint)
@@ -658,20 +661,20 @@ void SvgGDC::DrawHollowOval(int32_t xCenter, int32_t yCenter, int32_t rx, int32_
 
 void SvgGDC::DrawArc(int32_t x, int32_t y, const int32_t nRadius, const float fStartAngle, const float fSweepAngle, const GDCPaint &paint) 
 {
-	const int32_t x1 = int32_t(x + nRadius * (::cos(-fStartAngle * SVG_PI / 180.0)));
-	const int32_t y1 = int32_t(y + nRadius * (::sin(-fStartAngle * SVG_PI / 180.0)));
+    const int32_t x1 = int32_t(x + nRadius * (::cos(-fStartAngle * SVG_PI / 180.0)));
+    const int32_t y1 = int32_t(y + nRadius * (::sin(-fStartAngle * SVG_PI / 180.0)));
 
-	const int32_t x2 = int32_t(x + nRadius * (::cos(-fSweepAngle * SVG_PI / 180.0)));
-	const int32_t y2 = int32_t(y + nRadius * (::sin(-fSweepAngle * SVG_PI / 180.0)));
+    const int32_t x2 = int32_t(x + nRadius * (::cos(-fSweepAngle * SVG_PI / 180.0)));
+    const int32_t y2 = int32_t(y + nRadius * (::sin(-fSweepAngle * SVG_PI / 180.0)));
 
-	std::string sLine = "<path d=\"";
-	sLine += "M" + std::to_string(x) + " " + std::to_string(y);   // Move to center
-	sLine += "L" + std::to_string(x1) + " " + std::to_string(y1); // Line to first point
-	sLine += "A" + std::to_string(nRadius) + " " + std::to_string(nRadius) + " 0 0 0 " + std::to_string(x2) + " " + std::to_string(y2); // Actual Arc to point nr. 2
-	sLine += "L" + std::to_string(x) + " " + std::to_string(y);   // Move to center
-	sLine += "\"  style=\"fill:none;" + Stroke(paint);
-	sLine += "\"/>";
-	line(sLine.c_str());
+    std::string sLine = "<path d=\"";
+    sLine += "M" + std::to_string(x) + " " + std::to_string(y);   // Move to center
+    sLine += "L" + std::to_string(x1) + " " + std::to_string(y1); // Line to first point
+    sLine += "A" + std::to_string(nRadius) + " " + std::to_string(nRadius) + " 0 0 0 " + std::to_string(x2) + " " + std::to_string(y2); // Actual Arc to point nr. 2
+    sLine += "L" + std::to_string(x) + " " + std::to_string(y);   // Move to center
+    sLine += "\"  style=\"fill:none;" + Stroke(paint);
+    sLine += "\"/>";
+    line(sLine.c_str());
 }	
 
 void SvgGDC::DrawBitmap(HBITMAP hBitmap, int32_t x, int32_t y) 
@@ -721,7 +724,7 @@ static inline std::string ConvertToUTF8(const wchar_t *wstr)
 
     const auto size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], nLen, NULL, 0, NULL, NULL);
     std::string strTo(size_needed, 0);
-    WideCharToMultiByte(CP_UTF8, 0, &wstr[0], nLen, &strTo[0], size_needed, NULL, NULL);
+    ::WideCharToMultiByte(CP_UTF8, 0, &wstr[0], nLen, &strTo[0], size_needed, NULL, NULL);
     return strTo;
 }
 
@@ -733,53 +736,61 @@ void SvgGDC::TextOut(const wchar_t *sText, int32_t x, int32_t y, const GDCPaint 
     // font-family
     // http://vanseodesign.com/web-design/svg-text-baseline-alignment/
     std::string sPaint;
+    const GDCFontDescr *pFont = paint.GetFontDescr();
+    if ( pFont->m_nTextAlign & GDC_TA_BOTTOM ) {
+        sPaint += "dominant-baseline=\"text-after-edge\"";
+    }
+    else if ( pFont->m_nTextAlign & GDC_TA_BASELINE ) {
+        sPaint += "alignment-baseline=\"baseline\"";
+    }
+    else if ( pFont->m_nTextAlign & GDC_TA_TOP ) {
+        sPaint += "dominant-baseline=\"text-before-edge\"";
+    }
+    sPaint += " ";
+    if ( pFont->m_nTextAlign & GDC_TA_LEFT ) {
+        sPaint += "text-anchor=\"start\"";
+    }
+    else if ( pFont->m_nTextAlign & GDC_TA_CENTER ) {
+        sPaint += "text-anchor=\"middle\"";
+    }
+    else if ( pFont->m_nTextAlign & GDC_TA_RIGHT ) {
+        sPaint += "text-anchor=\"end\"";
+    }
+    GDCFontWeight weight = pFont->m_weight;
+    if ( weight <= 0 ) {
+        weight = GDC_FW_NORMAL; // chromium does not like 0 
+    }
+    sPaint += " ";
+    sPaint += "font-weight=\"";
+    sPaint += std::to_string(weight);
+    sPaint += "\" ";                  
+    sPaint += "font-size=\"";
+    sPaint += std::to_string(::abs(pFont->m_nHeight));
+    sPaint += "\" ";       
     {
-        const GDCFontDescr *pFont = paint.GetFontDescr();
         {
             std::string sColor = PaintColorToString(paint);
             std::string sStyle = "style=\"";
                         sStyle += "font-family:";
                         sStyle += ConvertToUTF8(pFont->m_sFontName.c_str());
                         sStyle += ";";
-                        sStyle += "font-size:";
-                        sStyle += std::to_string(::abs(pFont->m_nHeight));
-                        sStyle += ";";
-                        sStyle += "font-weight:";
-                        sStyle += std::to_string(pFont->m_weight);
-                        sStyle += ";";
                         sStyle += "fill:";
                         sStyle += sColor.c_str();
-                        sStyle += ";";
-                        if ( pFont->m_nTextAlign & GDC_TA_LEFT ) {
-                            sStyle += "text-anchor:start";
-                        }
-                        else if ( pFont->m_nTextAlign & GDC_TA_CENTER ) {
-                            sStyle += "text-anchor:middle";
-                        }
-                        else if ( pFont->m_nTextAlign & GDC_TA_RIGHT ) {
-                            sStyle += "text-anchor:end";
-                        }
-
-						sStyle += ";";
-						if ( pFont->m_nTextAlign & GDC_TA_BOTTOM ) {
-                            sStyle += "dominant-baseline:text-after-edge";
-                        }
-                        else if ( pFont->m_nTextAlign & GDC_TA_BASELINE ) {
-                            sStyle += "alignment-baseline:hanging";
-                        }
-                        else if ( pFont->m_nTextAlign & GDC_TA_TOP ) {
-                            sStyle += "dominant-baseline:text-before-edge";
-                        }
+                        //sStyle += ";";
+                        //sStyle += ";";
                         sStyle += "\"";
-            sPaint  = sStyle;
+            sPaint  += sStyle;
         }
         {
             float fAngle = pFont->m_fAngle;
             fAngle = float((-1)*fAngle/10.);
             std::string sAngle = float_to_string(fAngle);
+            // The rotate(<a> [<x> <y>]) transform function specifies a rotation by a degrees about a given point. 
+            // If optional parameters x and y are not supplied, the rotation is about the origin of the current user coordinate system. 
+            // If optional parameters x and y are supplied, the rotate is about the point (x, y).
             std::string sTransform  = "transform=\"rotate(";
                         sTransform += sAngle;
-                        sTransform += " ";
+                        sTransform += ",";
                         sTransform += std::to_string(x);
                         sTransform += ",";
                         sTransform += std::to_string(y);
@@ -814,17 +825,17 @@ GDCSize SvgGDC::GetTextExtent(const wchar_t *sText, size_t nCount, const GDCPain
 
 void SvgGDC::SetViewportOrg(int32_t x, int32_t y) 
 {
-    const std::string sWidth  = std::to_string(m_nWidth);
-    const std::string sHeight = std::to_string(m_nHeight);
+    std::string sWidth  = std::to_string(m_nWidth);
+    std::string sHeight = std::to_string(m_nHeight);
 
     std::string sViewBox  = "viewbox=\"";
                 sViewBox += std::to_string(-x);
                 sViewBox += " ";
                 sViewBox += std::to_string(-y);
                 sViewBox += " ";
-                sViewBox += std::to_string(m_nWidth);
+                sViewBox += sWidth;
                 sViewBox += " ";
-                sViewBox += std::to_string(m_nHeight);
+                sViewBox += sHeight;
                 sViewBox += "\"";
 
     // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/shape-rendering
@@ -840,17 +851,27 @@ void SvgGDC::SetViewportOrg(int32_t x, int32_t y)
     // to vertical or horizontal. Also, the user agent might adjust line positions and line widths to align edges with device pixels.
     // *geometricPrecision
     // Indicates that the user agent shall emphasize geometric precision over speed and crisp edges.
-
-    line("<svg width=\"", sWidth.c_str(), "\" height=\"", sHeight.c_str(), "\" ", sViewBox.c_str(), " shape-rendering=\"crispEdges\">");
-    // special case for the cromium engine: staticly types invert filter  to have at least possibility to hilight elements
+    if ( m_bAutoSize )
+    {
+        sWidth  = "100%";
+        sHeight = "100%";
+        line("<svg width=\"", sWidth.c_str(), "\" height=\"", sHeight.c_str(), "\" ", sViewBox.c_str(), " shape-rendering=\"geometricPrecision\" xmlns=\"http://www.w3.org/2000/svg\">");
+    }
+    else {
+        // quality a bit better vs. geometricPrecision
+        line("<svg width=\"", sWidth.c_str(), "\" height=\"", sHeight.c_str(), "\" ", sViewBox.c_str(), " shape-rendering=\"crispEdges\" xmlns=\"http://www.w3.org/2000/svg\">");
+    }
+    
+    // special case for the cromium engine: staticly types invert filter to have at least possibility to hilight elements
     // https://stackoverflow.com/questions/32567156/why-dont-css-filters-work-on-svg-elements-in-chrome
     // workaround:
-    line("<defs> <filter id=\"invert_svg\"> <feColorMatrix type=\"matrix\" \
-        values='-1  0  0 0 1      \
-                 0 -1  0 0 1      \
-                 0  0 -1 0 1      \
-                 0  0  0 0.5 0'/> \
-          </filter></defs>");
+    //line("<defs> <filter id=\"invert_svg\"> <feColorMatrix type=\"matrix\" \
+    //    values='-1  0  0 0 1      \
+    //             0 -1  0 0 1      \
+    //             0  0 -1 0 1      \
+    //             0  0  0 0.5 0'/> \
+    //      </filter></defs>");
+    // this code can be added into the html page as additional svg item if selction required
 }
 
 GDCPoint SvgGDC::GetViewportOrg() const 
@@ -870,7 +891,14 @@ void SvgGDC::EndGroup()
     line("</g>");
 }
 
-void SvgGDC::DrawTextByEllipse(double dRadiusX, double dRadiusY, const GDCPoint &ptCenter, const wchar_t *sText, double dEllipseAngleRad, const GDCPaint &paint)
+void SvgGDC::DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, 
+                               const wchar_t *sText, bool bAllignBottom, double dEllipseAngleRad, const GDCPaint &paint)
 {
-    //
+    //TODO
+}
+
+void SvgGDC::DrawTextByCircle(double dCenterAngle, int32_t nRadius, int32_t nCX, int32_t nCY, const wchar_t *sText, 
+                              bool bAllignBottom, bool bRevertTextDir, const GDCPaint &paint)
+{
+    //TODO
 }

@@ -1200,7 +1200,7 @@ public:
 
         if(lastResult == Ok)
         {
-            for(INT i = 0; i < count1; i++)
+            for (INT i = 0; i < count1; i++)
             {
                 colors[i].SetValue(argbs[i]);
             }        
@@ -1230,7 +1230,7 @@ public:
         if(argbs == NULL)
             return SetStatus(OutOfMemory);
 
-        for(INT i = 0; i < count1; i++)
+        for (INT i = 0; i < count1; i++)
         {
             argbs[i] = colors[i].GetValue();
         }
@@ -1370,7 +1370,7 @@ public:
         ARGB* argbs = (ARGB*) new ARGB[count];
         if(argbs)
         {
-            for(INT i = 0; i < count; i++)
+            for (INT i = 0; i < count; i++)
             {
                 argbs[i] = presetColors[i].GetValue();
             }
@@ -1412,7 +1412,7 @@ public:
                                 blendPositions,
                                 count));
         
-        for(INT i = 0; i < count; i++)
+        for (INT i = 0; i < count; i++)
         {
             presetColors[i] = Color(argbs[i]);
         }
