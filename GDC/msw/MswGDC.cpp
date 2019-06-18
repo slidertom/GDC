@@ -224,7 +224,12 @@ public:
         }
 
         pDC->SetTextAlign(nAllign);
-	    pDC->SetBkMode(TRANSPARENT);
+        if (paint.m_bk_mode == GDC_TRANSPARENT) {
+            pDC->SetBkMode(TRANSPARENT);
+        } else {
+            pDC->SetBkColor(paint.m_bk_color);
+            pDC->SetBkMode(OPAQUE);
+        }
 	    pDC->SetTextColor(paint.m_color);
     }
 
@@ -386,9 +391,6 @@ void CMswGDC::DrawPolygon(const std::vector<GDCPoint> &points, const GDCPaint &f
 void CMswGDC::DrawPoly(const std::vector<GDCPoint> &points, const GDCPaint &stroke_paint)
 {
     const size_t cnt = points.size();
-    if ( cnt < 2 ) {
-        return;
-    }
 
     ODCInit::SelectStrokePaint(m_pDC, stroke_paint);
     ODCInit::CBinaryRaster rop2(m_pDC, stroke_paint);
@@ -457,17 +459,17 @@ void CMswGDC::DrawPolygonGradient(const std::vector<GDCPoint> &points, const GDC
                              (unsigned char)GetRValue(colorTo), (unsigned char)GetGValue(colorTo), (unsigned char)GetBValue(colorTo));
 }
 
-void CMswGDC::DrawPolygonTexture(const std::vector<GDCPoint> &points, const wchar_t * sTexturePath, double dAngle, float fZoom)
+void CMswGDC::DrawPolygonTexture(const std::vector<GDCPoint> &points, const wchar_t *sTexturePath, double dAngle, float fZoom)
 {
     const BOOL useEmbeddedColorManagement = FALSE;
-    Gdiplus::Image* pImage = Gdiplus::Image::FromFile(sTexturePath, useEmbeddedColorManagement);
+    std::unique_ptr<Gdiplus::Image> pImage(Gdiplus::Image::FromFile(sTexturePath, useEmbeddedColorManagement));
     if (pImage && pImage->GetLastStatus() != Gdiplus::Ok) {
         return;
     }
 
     const Gdiplus::Point *gdi_points = internal::GdcPoly2GdiPlus(points);
 
-    Gdiplus::TextureBrush brush(pImage, Gdiplus::WrapModeTile);
+    Gdiplus::TextureBrush brush(pImage.get(), Gdiplus::WrapModeTile);
     brush.ScaleTransform(fZoom, fZoom);
     brush.RotateTransform((float) dAngle);
     brush.TranslateTransform((float) gdi_points[0].X, (float) gdi_points[0].Y, Gdiplus::MatrixOrderAppend);
@@ -479,10 +481,11 @@ void CMswGDC::DrawPolygonTexture(const std::vector<GDCPoint> &points, const wcha
     delete[] gdi_points;
 }
 
-void CMswGDC::DrawPolygonTexture(const std::vector<GDCPoint> &points, const std::vector<GDCPoint> &points_exclude, const wchar_t * sTexturePath, double dAngle, float fZoom)
+void CMswGDC::DrawPolygonTexture(const std::vector<GDCPoint> &points, const std::vector<GDCPoint> &points_exclude, 
+                                 const wchar_t *sTexturePath, double dAngle, float fZoom)
 {
     const BOOL useEmbeddedColorManagement = FALSE;
-    Gdiplus::Image* pImage = Gdiplus::Image::FromFile(sTexturePath, useEmbeddedColorManagement);
+    std::unique_ptr<Gdiplus::Image> pImage(Gdiplus::Image::FromFile(sTexturePath, useEmbeddedColorManagement));
     if (pImage && pImage->GetLastStatus() != Gdiplus::Ok) {
         return;
     }
@@ -490,14 +493,14 @@ void CMswGDC::DrawPolygonTexture(const std::vector<GDCPoint> &points, const std:
     const Gdiplus::Point *gdi_points_include = internal::GdcPoly2GdiPlus(points);
     const Gdiplus::Point *gdi_points_exclude = internal::GdcPoly2GdiPlus(points_exclude);
 
-    Gdiplus::TextureBrush brush(pImage, Gdiplus::WrapModeTile);
+    Gdiplus::TextureBrush brush(pImage.get(), Gdiplus::WrapModeTile);
     brush.ScaleTransform(fZoom, fZoom);
-    brush.RotateTransform((float) dAngle);
-    brush.TranslateTransform((float) gdi_points_include[0].X, (float) gdi_points_include[0].Y, Gdiplus::MatrixOrderAppend);
+    brush.RotateTransform((float)dAngle);
+    brush.TranslateTransform((float)gdi_points_include[0].X, (float)gdi_points_include[0].Y, Gdiplus::MatrixOrderAppend);
 
     Gdiplus::GraphicsPath path_include, path_exclude;
-    path_include.AddPolygon(gdi_points_include, (int)points.size());
-    path_exclude.AddPolygon(gdi_points_exclude, (int)points.size());
+    path_include.AddPolygon(gdi_points_include, (int32_t)points.size());
+    path_exclude.AddPolygon(gdi_points_exclude, (int32_t)points.size());
 
     Gdiplus::Region region(&path_include);
     region.Exclude(&path_exclude);
@@ -600,6 +603,16 @@ void CMswGDC::TextOut(const wchar_t *sText, int32_t x, int32_t y, const GDCPaint
 {
     ODCInit::SelectFont(m_pDC, paint);
     m_pDC->TextOut(x, y, sText);	
+}
+
+void CMswGDC::DrawText(const wchar_t *sText, const RECT &rect, const GDCPaint &paint)
+{
+    ODCInit::SelectFont(m_pDC, paint);
+    //Reset Font Alignment and use Alignment in the rect
+    m_pDC->SetTextAlign(TA_LEFT | TA_TOP | TA_NOUPDATECP);
+    const UINT nAlignInRect = paint.GetFontDescr()->m_nTextAlign | DT_NOCLIP | DT_SINGLELINE;
+    const int32_t nSize = (int32_t)::wcslen(sText);
+    m_pDC->DrawText(sText, nSize, &rect, nAlignInRect);
 }
 
 int32_t CMswGDC::GetTextHeight(const GDCPaint &paint) const

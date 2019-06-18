@@ -43,6 +43,7 @@ public:
     virtual void DrawBitmap(HBITMAP hBitmap, int32_t x, int32_t y) = 0; // temporal solution: HBITMAP must be replaced with the GDCBitmap
         
     virtual void TextOut(const wchar_t *sText, int32_t x, int32_t y, const GDCPaint &paint) = 0;
+    virtual void DrawText(const wchar_t *sText, const RECT &rect, const GDCPaint &paint) = 0;
     virtual void DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, const wchar_t *sText, bool bAllignBottom, double dEllipseAngleRad, const GDCPaint &paint) = 0;
     virtual void DrawTextByCircle(double dCenterAngle, int32_t nRadius, int32_t nCX, int32_t nCY, const wchar_t *sText, bool bAllignBottom, bool bRevertTextDir, const GDCPaint &paint) = 0;
     

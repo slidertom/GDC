@@ -11,8 +11,8 @@
 static inline LOGFONT *CreateDefLogFont()
 {
     LOGFONT *pLF = new LOGFONT;
-    memset(pLF, 0, sizeof(LOGFONT));
-	_tcscpy(pLF->lfFaceName, L"Arial");
+    ::memset(pLF, 0, sizeof(LOGFONT));
+	::wcscpy(pLF->lfFaceName, L"Arial");
     pLF->lfWeight = FW_NORMAL;
     return pLF;
 }
@@ -20,7 +20,7 @@ static inline LOGFONT *CreateDefLogFont()
 CMswPaint::CMswPaint(const GDCFontDescr *pFontDescr)
 {
     m_pLF = new LOGFONT;
-    memset(m_pLF, 0, sizeof(LOGFONT));
+    ::memset(m_pLF, 0, sizeof(LOGFONT));
 
 	::wcscpy(m_pLF->lfFaceName, pFontDescr->m_sFontName.c_str());
 	m_pLF->lfHeight      = pFontDescr->m_nHeight;

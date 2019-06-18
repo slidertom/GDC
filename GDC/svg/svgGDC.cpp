@@ -511,7 +511,7 @@ std::string SvgGDC::GetFill(const GDCPaint &fill_paint)
 void SvgGDC::DrawPolygon(const std::vector<GDCPoint> &points, const GDCPaint &fill_paint, const GDCPaint &stroke_paint) 
 {
     const std::string sFill   = GetFill(fill_paint);
-    const std::string sPoints = PointsToStr(points);
+    const std::string sPoints = ::PointsToStr(points);
     line("<polygon points=", sPoints.c_str(), " style=\"", sFill.c_str(), ";", Stroke(stroke_paint).c_str(), "\" />");
 }
 
@@ -524,7 +524,7 @@ void SvgGDC::DrawPoly(const std::vector<GDCPoint> &points, const GDCPaint &strok
 
 void SvgGDC::DrawPolyLine(const std::vector<GDCPoint> &points, const GDCPaint &stroke_paint) 
 {
-    std::string sPoints = PointsToStr(points);
+    std::string sPoints = ::PointsToStr(points);
     line("<polyline points=", sPoints.c_str(), " style=\"fill:none;", Stroke(stroke_paint).c_str(), "\" />");
 }
     
@@ -805,6 +805,11 @@ void SvgGDC::TextOut(const wchar_t *sText, int32_t x, int32_t y, const GDCPaint 
     line("<text x=\"", std::to_string(x).c_str(),
             "\" y=\"", std::to_string(y).c_str(), 
             "\" ", sPaint.c_str(), ">", sTextUTF8.c_str(), "</text>");
+}
+
+void SvgGDC::DrawText(const wchar_t *sText, const RECT &rect, const GDCPaint &paint)
+{
+    ASSERT(FALSE);
 }
 
 #include "../GDI/oligdi.h"

@@ -44,6 +44,7 @@ public:
     virtual void DrawBitmap(HBITMAP hBitmap, int32_t x, int32_t y) override; 
         
     virtual void TextOut(const wchar_t *sText, int32_t x, int32_t y, const GDCPaint &paint) override;
+    virtual void DrawText(const wchar_t *sText, const RECT &rect, const GDCPaint &paint) override;
     virtual void DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, const wchar_t *sText, bool bAllignBottom, double dEllipseAngleRad, const GDCPaint &paint) override;
     virtual void DrawTextByCircle(double dCenterAngle, int32_t nRadius, int32_t nCX, int32_t nCY, const wchar_t *sText, bool bAllignBottom, bool bRevertTextDir, const GDCPaint &paint) override;
 

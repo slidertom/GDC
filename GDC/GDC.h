@@ -79,6 +79,12 @@ enum GDCFontAlign
 						  //  Text
 };
 
+enum GDCBackgroundMode
+{
+    GDC_TRANSPARENT = 1,
+    GDC_OPAQUE = 2
+};
+
 #include "string"
 
 class wxBitmap;
@@ -121,6 +127,9 @@ public:
     void SetColor(COLORREF color);
     COLORREF GetColor() const;
 
+    void SetBkColor(COLORREF color);
+    COLORREF GetBkColor() const;
+
     void SetAlfa(int32_t nAlfa);
     int32_t GetAlfa() const;
 
@@ -136,6 +145,9 @@ public:
     void SetRasterType(GDCRasterType type);
     GDCRasterType GetRasterType() const { return  m_raster_type; }
 
+    void SetBkMode(GDCBackgroundMode mode);
+    GDCBackgroundMode GetBkMode() const;
+
     void SetTextSize(int32_t nSize); // has to be deleted -> user has to create different paints
     void SetTextAlign(int32_t nAlign);
     void SetTextOrientation(float fAngle);
@@ -148,12 +160,14 @@ private:
     mutable CAbsPaint *m_pPaint {nullptr};
 
     COLORREF m_color {RGB(0, 0, 0)};
+    COLORREF m_bk_color {RGB(255, 255, 255)};
     int32_t m_nAlfa {-1}; //[0..255]; 0 < uses drawing with alfa transparency (ARGB)
     float m_fWidth  {1.};
     GDCStrokeType m_stroke_type {GDC_PS_SOLID};
     GDCPaintType  m_paint_type  {GDC_STROKE};
     GDCFontDescr *m_pFontDescr  {nullptr};
     GDCRasterType m_raster_type {GDC_R2_NONE};
+    GDCBackgroundMode m_bk_mode {GDC_TRANSPARENT};
 };
 
 class GDCPoint 
@@ -307,6 +321,7 @@ public:
         
     void TextOut(const wchar_t *sText, int32_t x, int32_t y, const GDCPaint &paint);
     void TextOutRect(const wchar_t *sText, const RECT &rect, const GDCPaint &paint);
+    void DrawText(const wchar_t *sText, const RECT &rect, const GDCPaint &paint);
 
     void DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, const wchar_t *sText, bool bAllignBottom, double dEllipseAngleRad, const GDCPaint &paint);
     void DrawTextByCircle(double dCenterAngle, int32_t nRadius, int32_t nCX, int32_t nCY, const wchar_t *sText, bool bAllignBottom, bool bRevertTextDir, const GDCPaint &paint);

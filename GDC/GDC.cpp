@@ -20,12 +20,13 @@ GDCFontDescr::GDCFontDescr(const wchar_t *sFontName, GDCFontWeight weight, int32
 }
 
 GDCFontDescr::GDCFontDescr(const GDCFontDescr &font_descr) {
+    m_fAngle     = font_descr.m_fAngle;
     m_sFontName  = font_descr.m_sFontName;
     m_weight     = font_descr.m_weight;
     m_nHeight    = font_descr.m_nHeight;
     m_nSlant     = font_descr.m_nSlant;
 	m_nUnderline = font_descr.m_nUnderline;
-    m_nTextAlign = GDC_TA_LEFT;
+    m_nTextAlign = font_descr.m_nTextAlign;
 }
 
 GDCFontDescr &GDCFontDescr::operator=(const GDCFontDescr &x)
@@ -73,6 +74,11 @@ void GDCPaint::SetColor(COLORREF color)
     //m_pPaint->SetColor(color);
 }
 
+void GDCPaint::SetBkColor(COLORREF color)
+{
+    m_bk_color = color;
+}
+
 void GDCPaint::SetStrokeWidth(float fWidth)
 {
     m_fWidth = fWidth;
@@ -89,6 +95,11 @@ void GDCPaint::SetPaintType(GDCPaintType type)
 {
     m_paint_type = type;
     //m_pPaint->SetPaintType(type);
+}
+
+void GDCPaint::SetBkMode(GDCBackgroundMode mode)
+{
+    m_bk_mode = mode;
 }
 
 void GDCPaint::SetRasterType(GDCRasterType type)
@@ -130,8 +141,10 @@ void GDCPaint::SetTextSize(int32_t nSize)
 }
 
 GDCPaintType GDCPaint::GetPaintType() const { return m_paint_type; }
+GDCBackgroundMode GDCPaint::GetBkMode() const { return m_bk_mode; }
 int32_t GDCPaint::GetAlfa() const   { return m_nAlfa; }
 COLORREF GDCPaint::GetColor() const { return m_color; }
+COLORREF GDCPaint::GetBkColor() const { return m_bk_color; }
 
 GDC::GDC(HDC hDC)
 {
@@ -155,6 +168,10 @@ void GDC::DrawPolygon(const std::vector<GDCPoint> &points, const GDCPaint &fill_
 
 void GDC::DrawPoly(const std::vector<GDCPoint> &points, const GDCPaint &stroke_paint)
 {
+    const size_t cnt = points.size();
+    if ( cnt < 2 ) {
+        return; // expected at least 3 points
+    }
     m_pDC->DrawPoly(points, stroke_paint);
 }
 
@@ -234,6 +251,11 @@ void GDC::TextOutRect(const wchar_t *sText, const RECT &rect, const GDCPaint &pa
     const int32_t pos_y = center_y - half_cy;
     
     m_pDC->TextOut(sText, pos_x, pos_y, paint);
+}
+
+void GDC::DrawText(const wchar_t *sText, const RECT &rect, const GDCPaint &paint)
+{
+    m_pDC->DrawText(sText, rect, paint);
 }
 
 void GDC::DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, const wchar_t *sText, bool bAllignBottom, double dEllipseAngleRad, const GDCPaint &paint)
