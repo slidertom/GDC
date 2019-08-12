@@ -267,7 +267,8 @@ namespace internal
 #endif
 
     template <class TPointVect>
-    void DrawTextByPath(Gdiplus::Graphics &gp, const Gdiplus::Font &font, TPointVect &path_points, const std::vector<int32_t> &lettersLenghts, const std::vector<CLetterItem> &letters, bool bAllignBottom, bool bRevertTextDir)
+    void DrawTextByPath(Gdiplus::Graphics &gp, const Gdiplus::Font &font, TPointVect &path_points, const std::vector<int32_t> &lettersLenghts, 
+                        const std::vector<CLetterItem> &letters, bool bAllignBottom, bool bRevertTextDir)
     {
         TPointVect intersectionPoints;
         draw_by_path_utils::GetCircleIntersectionPointsWithSegments(path_points, lettersLenghts, intersectionPoints);
@@ -290,8 +291,10 @@ namespace internal
 
             internal::CLetterItem item = letters[i];
 
-            double dOppositeLen = ::sqrt(pow(intersectionPoints[i].x + item.m_dWidthLP - intersectionPoints[i + 1].x, 2.0) + pow(intersectionPoints[i].y - intersectionPoints[i + 1].y, 2.0)) / 2.0;
-            double dHypLen      = ::sqrt(pow(intersectionPoints[i].x - intersectionPoints[i + 1].x, 2.0) + pow(intersectionPoints[i].y - intersectionPoints[i + 1].y, 2.0));
+            double dOppositeLen = ::sqrt(::pow(intersectionPoints[i].x + item.m_dWidthLP - intersectionPoints[i + 1].x, 2.0) + 
+                                         ::pow(intersectionPoints[i].y - intersectionPoints[i + 1].y, 2.0)) / 2.0;
+            double dHypLen      = ::sqrt(::pow(intersectionPoints[i].x - intersectionPoints[i + 1].x, 2.0) + 
+                                         ::pow(intersectionPoints[i].y - intersectionPoints[i + 1].y, 2.0));
 
             double dRatio = dOppositeLen / dHypLen;
 
@@ -463,7 +466,7 @@ namespace internal
 }
 
 void CGdiPlusTextDrawUtils::DrawTextByCircle(HDC hDC, const GDCPaint &paint, double dCenterAngle, int32_t nRadius, 
-                                             int32_t nCX, int32_t nCY, const wchar_t *sText, bool bAllignBottom, bool bRevertTextDir)
+                                             int32_t nCX, int32_t nCY, const wchar_t *sText, bool bRevertTextDir)
 {
     ASSERT(::wcslen(sText) > 0);
 
@@ -477,17 +480,19 @@ void CGdiPlusTextDrawUtils::DrawTextByCircle(HDC hDC, const GDCPaint &paint, dou
     pLF->lfItalic      = pFontDescr->m_nSlant;
     pLF->lfUnderline   = pFontDescr->m_nUnderline;
     pLF->lfOrientation = pLF->lfEscapement = (LONG)pFontDescr->m_fAngle;
+    bool bAllignBottom = pFontDescr->m_nTextAlign & GDC_TA_BOTTOM;
 
-    Gdiplus::Graphics    gp(hDC);
+    Gdiplus::Graphics gp(hDC);
     gp.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAlias);
-    Gdiplus::Font        font(hDC, pLF.get());
+    Gdiplus::Font font(hDC, pLF.get());
 
     std::vector<int32_t> charsLenghts;
     std::vector<internal::CLetterItem> chars;
     int32_t nAllTextLength;
     internal::GetTextCharsInfo(gp, font, sText, charsLenghts, nAllTextLength, chars);
 
-    double dStartAngle(0.0), dEndAngle(0.0);
+    double dStartAngle = 0.0;
+    double dEndAngle   = 0.0;
     internal::GetCircleStartEndAngles(nAllTextLength, dCenterAngle, nRadius, dStartAngle, dEndAngle);
 
     std::vector<POINT> path_points;
@@ -543,7 +548,8 @@ namespace ell_to_points
     }
 }
 
-void CGdiPlusTextDrawUtils::DrawTextByEllipse(HDC hDC, const GDCPaint &paint, double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t nCX, int32_t nCY, const wchar_t *sText, bool bAllignBottom, double dEllipseAngleRad)
+void CGdiPlusTextDrawUtils::DrawTextByEllipse(HDC hDC, const GDCPaint &paint, double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t nCX, int32_t nCY, 
+                                              const wchar_t *sText, double dEllipseAngleRad)
 {
     ASSERT(::wcslen(sText) > 0);
 
@@ -551,13 +557,13 @@ void CGdiPlusTextDrawUtils::DrawTextByEllipse(HDC hDC, const GDCPaint &paint, do
     ::memset(pLF.get(), 0, sizeof(LOGFONT));
 
     const GDCFontDescr *pFontDescr = paint.GetFontDescr();
-
     ::wcscpy(pLF->lfFaceName, pFontDescr->m_sFontName.c_str());
     pLF->lfHeight      = pFontDescr->m_nHeight;
     pLF->lfWeight      = pFontDescr->m_weight;
     pLF->lfItalic      = pFontDescr->m_nSlant;
     pLF->lfUnderline   = pFontDescr->m_nUnderline;
     pLF->lfOrientation = pLF->lfEscapement = (LONG)pFontDescr->m_fAngle;
+    bool bAllignBottom = pFontDescr->m_nTextAlign & GDC_TA_BOTTOM;
 
     Gdiplus::Graphics gp(hDC);
     gp.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAlias);

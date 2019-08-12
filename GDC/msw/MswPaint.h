@@ -21,16 +21,16 @@ public:
 
 // Overrides
 public:
-    virtual void SetColor(COLORREF color)            override;
-    virtual void SetAlfa(int32_t nAlfa)              override;
+    virtual void SetColor(COLORREF color) override;
+    virtual void SetAlfa(int32_t nAlfa) override;
 
-    virtual void SetStrokeWidth(double dWidth)       override;
-    virtual void SetStrokeType(GDCStrokeType type)   override;
-    virtual void SetPaintType(GDCPaintType type)     override;
+    virtual void SetStrokeWidth(double dWidth) override;
+    virtual void SetStrokeType(GDCStrokeType type) override;
+    virtual void SetPaintType(GDCPaintType type) override;
 
-    virtual void SetTextSize(int32_t nSize)          override;
-    virtual void SetTextAlign(int32_t nAlign)        override;
-    virtual void SetTextOrientation(double dAngle)   override;
+    virtual void SetTextSize(int32_t nSize) override;
+    virtual void SetTextAlign(int32_t nAlign) override;
+    virtual void SetTextOrientation(double dAngle) override;
     
 // Attributes
 private:

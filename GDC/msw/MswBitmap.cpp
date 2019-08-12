@@ -19,9 +19,9 @@ CMswBitmap::CMswBitmap(HBITMAP hBitmap)
 {
     m_pBitmap = new OBitmap(hBitmap);
     //BITMAP bm;
-	//m_pBitmap->GetObject(bm);
-	//m_width  = bm.bmWidth;
-	//m_height = bm.bmHeight;
+    //m_pBitmap->GetObject(bm);
+    //m_width  = bm.bmWidth;
+    //m_height = bm.bmHeight;
 }
 
 CMswBitmap::~CMswBitmap()

@@ -12,7 +12,6 @@
 
 #include "../../GDC/msw/gdi_plus_inc//GdiPlus.h"
 
-
 #include "memory"
 
 #ifdef _DEBUG
@@ -42,8 +41,7 @@ namespace internal
 
         return points;
     }
-}
-
+};
 
 class ODCInit
 {
@@ -84,9 +82,9 @@ public:
             case GDC_PS_DASHDOT:
                 nStyle = PS_DASHDOT;
             break;
-			case GDC_PS_DASHDOTDOT:
-				nStyle = PS_DASHDOTDOT;
-			break;
+            case GDC_PS_DASHDOTDOT:
+                nStyle = PS_DASHDOTDOT;
+            break;
             default:
                 ASSERT(FALSE); // unsuported type
             break;
@@ -127,46 +125,46 @@ public:
                 //pDC->SelectStockObject(HOLLOW_BRUSH);
             }
             break;
-		case GDC_FILL_VERTICAL:
-			{
-				if (!pPaint->m_pBrush) {
-					pPaint->m_pBrush = new OBrush(fill_paint.m_color, HS_VERTICAL);
-				}
-				pDC->SetBkMode(TRANSPARENT);
-			}
-			break;
-		case GDC_FILL_HORIZONTAL:
-			{
-				if (!pPaint->m_pBrush) {
-					pPaint->m_pBrush = new OBrush(fill_paint.m_color, HS_HORIZONTAL);
-				}
-				pDC->SetBkMode(TRANSPARENT);
-			}
-			break;
-		case GDC_FILL_FDIAGONAL:
-			{
-				if (!pPaint->m_pBrush) {
-					pPaint->m_pBrush = new OBrush(fill_paint.m_color, HS_FDIAGONAL);
-				}
-				pDC->SetBkMode(TRANSPARENT);
-			}
-			break;
-		case GDC_FILL_BDIAGONAL:
-			{
-				if (!pPaint->m_pBrush) {
-					pPaint->m_pBrush = new OBrush(fill_paint.m_color, HS_BDIAGONAL);
-				}
-				pDC->SetBkMode(TRANSPARENT);
-			}
-			break;
-		case GDC_FILL_CROSS:
-			{
-				if (!pPaint->m_pBrush) {
-					pPaint->m_pBrush = new OBrush(fill_paint.m_color, HS_CROSS);
-				}
-				pDC->SetBkMode(TRANSPARENT);
-			}
-			break;
+        case GDC_FILL_VERTICAL:
+            {
+                if (!pPaint->m_pBrush) {
+                    pPaint->m_pBrush = new OBrush(fill_paint.m_color, HS_VERTICAL);
+                }
+                pDC->SetBkMode(TRANSPARENT);
+            }
+            break;
+        case GDC_FILL_HORIZONTAL:
+            {
+                if (!pPaint->m_pBrush) {
+                    pPaint->m_pBrush = new OBrush(fill_paint.m_color, HS_HORIZONTAL);
+                }
+                pDC->SetBkMode(TRANSPARENT);
+            }
+            break;
+        case GDC_FILL_FDIAGONAL:
+            {
+                if (!pPaint->m_pBrush) {
+                    pPaint->m_pBrush = new OBrush(fill_paint.m_color, HS_FDIAGONAL);
+                }
+                pDC->SetBkMode(TRANSPARENT);
+            }
+            break;
+        case GDC_FILL_BDIAGONAL:
+            {
+                if (!pPaint->m_pBrush) {
+                    pPaint->m_pBrush = new OBrush(fill_paint.m_color, HS_BDIAGONAL);
+                }
+                pDC->SetBkMode(TRANSPARENT);
+            }
+            break;
+        case GDC_FILL_CROSS:
+            {
+                if (!pPaint->m_pBrush) {
+                    pPaint->m_pBrush = new OBrush(fill_paint.m_color, HS_CROSS);
+                }
+                pDC->SetBkMode(TRANSPARENT);
+            }
+            break;
         default:
             ASSERT(FALSE);
             return nullptr;
@@ -174,9 +172,9 @@ public:
         }
         pDC->SelectObject(pPaint->m_pBrush);
 
-		ASSERT(pPaint->m_pBrush);
+        ASSERT(pPaint->m_pBrush);
 
-		return pPaint->m_pBrush;
+        return pPaint->m_pBrush;
     }
 
     static void SelectFont(ODC *pDC, const GDCPaint &paint)
@@ -199,28 +197,28 @@ public:
         }
         pDC->SelectObject(*pPaint->m_pFont);
 
-		int32_t nAllign(0);
+        int32_t nAllign(0);
 
-		// Transfer Horizontal
-		if (paint.m_pFontDescr->m_nTextAlign & GDC_TA_LEFT) {
-			nAllign |= TA_LEFT;
+        // Transfer Horizontal
+        if (paint.m_pFontDescr->m_nTextAlign & GDC_TA_LEFT) {
+            nAllign |= TA_LEFT;
         }
-		if (paint.m_pFontDescr->m_nTextAlign & GDC_TA_RIGHT ) {
-			nAllign |= TA_RIGHT;
+        if (paint.m_pFontDescr->m_nTextAlign & GDC_TA_RIGHT ) {
+            nAllign |= TA_RIGHT;
         }
-		if ( paint.m_pFontDescr->m_nTextAlign & GDC_TA_CENTER) {
-			nAllign |= TA_CENTER;
+        if ( paint.m_pFontDescr->m_nTextAlign & GDC_TA_CENTER) {
+            nAllign |= TA_CENTER;
         }
 
-		// Transfer Vertical
-		if (paint.m_pFontDescr->m_nTextAlign & GDC_TA_BOTTOM) {
-			nAllign |= TA_BOTTOM;
+        // Transfer Vertical
+        if (paint.m_pFontDescr->m_nTextAlign & GDC_TA_BOTTOM) {
+            nAllign |= TA_BOTTOM;
         }
-		if (paint.m_pFontDescr->m_nTextAlign & GDC_TA_BASELINE) {
-			nAllign |= TA_BASELINE;
+        if (paint.m_pFontDescr->m_nTextAlign & GDC_TA_BASELINE) {
+            nAllign |= TA_BASELINE;
         }
-		if (paint.m_pFontDescr->m_nTextAlign & GDC_TA_TOP) {
-			nAllign |= TA_TOP;
+        if (paint.m_pFontDescr->m_nTextAlign & GDC_TA_TOP) {
+            nAllign |= TA_TOP;
         }
 
         pDC->SetTextAlign(nAllign);
@@ -230,10 +228,10 @@ public:
             pDC->SetBkColor(paint.m_bk_color);
             pDC->SetBkMode(OPAQUE);
         }
-	    pDC->SetTextColor(paint.m_color);
+        pDC->SetTextColor(paint.m_color);
     }
 
-    // Binary raster class
+// Binary raster class
 public:
     class CBinaryRaster
     {
@@ -330,7 +328,7 @@ CMswGDC::~CMswGDC()
 //		CDC|SOLID	0.127	0.29	
 //		GDI+|DASH	1.24	1.73	Much denser pattern than CDC
 //		GDI+|SOLID	0.78	1.08	
-// CDC is faster than GD+:			
+// CDC is faster than GDO+:			
 //			         1px	3px	
 //		CDC|DASH	7.29	5.99	
 //		CDC|SOLID	6.14	3.72	
@@ -398,8 +396,8 @@ void CMswGDC::DrawPoly(const std::vector<GDCPoint> &points, const GDCPaint &stro
     const GDCPoint &pt = points.front();
     m_pDC->MoveTo(pt);
     for (auto i1 = 0; i1 < cnt; ++i1) {
-		m_pDC->LineTo(points[i1]);	
-	}
+        m_pDC->LineTo(points[i1]);	
+    }
     m_pDC->LineTo(pt); // do close 
 }
 
@@ -442,21 +440,21 @@ void CMswGDC::DrawPolygonTransparent(const std::vector<GDCPoint> &points, const 
 
 void CMswGDC::DrawPolygonGradient(const std::vector<GDCPoint> &points, const GDCPaint &paintFrom, const GDCPaint &paintTo)
 {
-	COLORREF colorFrom = paintFrom.GetColor();
-	COLORREF colorTo   = paintTo.GetColor();
+    COLORREF colorFrom = paintFrom.GetColor();
+    COLORREF colorTo   = paintTo.GetColor();
 
-	std::vector<POINT> points2;
-	points2.reserve(points.size());
-	POINT point;
-	for (const GDCPoint &pt : points) {
-		point.x = pt.x;
-		point.y = pt.y;
-		points2.push_back(point);
-	}
+    std::vector<POINT> points2;
+    points2.reserve(points.size());
+    POINT point;
+    for (const GDCPoint &pt : points) {
+        point.x = pt.x;
+        point.y = pt.y;
+        points2.push_back(point);
+    }
 
-	CGdiPlusUtil::DrawPolygon(m_pDC->GetSafeHdc(), points2, 
+    CGdiPlusUtil::DrawPolygon(m_pDC->GetSafeHdc(), points2, 
                              (unsigned char)GetRValue(colorFrom), (unsigned char)GetGValue(colorFrom), (unsigned char)GetBValue(colorFrom), 
-                             (unsigned char)GetRValue(colorTo), (unsigned char)GetGValue(colorTo), (unsigned char)GetBValue(colorTo));
+                             (unsigned char)GetRValue(colorTo),   (unsigned char)GetGValue(colorTo),   (unsigned char)GetBValue(colorTo));
 }
 
 void CMswGDC::DrawPolygonTexture(const std::vector<GDCPoint> &points, const wchar_t *sTexturePath, double dAngle, float fZoom)
@@ -521,8 +519,8 @@ void CMswGDC::DrawPolyLine(const std::vector<GDCPoint> &points, const GDCPaint &
     m_pDC->MoveTo(pt);
     const size_t cnt = points.size();
     for (auto i1 = 0; i1 < cnt; ++i1) {
-		m_pDC->LineTo(points[i1]);	
-	}
+        m_pDC->LineTo(points[i1]);	
+    }
 }
 
 void CMswGDC::DrawPoint(int32_t x, int32_t y, const GDCPaint &paint)
@@ -531,7 +529,7 @@ void CMswGDC::DrawPoint(int32_t x, int32_t y, const GDCPaint &paint)
     ODCInit::SelectStrokePaint(m_pDC, paint);
     ODCInit::CBinaryRaster rop2(m_pDC, paint);
     m_pDC->MoveTo(x, y);
-	m_pDC->LineTo(x, y);
+    m_pDC->LineTo(x, y);
 }
 
 void CMswGDC::DrawFilledRectangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &fill_paint)
@@ -545,8 +543,8 @@ void CMswGDC::DrawRectangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, cons
 {
     ODCInit::SelectStrokePaint(m_pDC, stroke_paint);
     //Force to draw only line, no fill.
-	OBrush brush(NULL_BRUSH);
-	m_pDC->SelectObject(&brush);
+    OBrush brush(NULL_BRUSH);
+    m_pDC->SelectObject(&brush);
 
     ODCInit::CBinaryRaster rop2(m_pDC, stroke_paint);
 
@@ -555,11 +553,11 @@ void CMswGDC::DrawRectangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, cons
 
 void CMswGDC::DrawEllipse(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &paint)
 {
-	ODCInit::SelectStrokePaint(m_pDC, paint);
+    ODCInit::SelectStrokePaint(m_pDC, paint);
 
-	//Force to draw only line, no fill.
-	OBrush brush(NULL_BRUSH);
-	m_pDC->SelectObject(&brush);
+    //Force to draw only line, no fill.
+    OBrush brush(NULL_BRUSH);
+    m_pDC->SelectObject(&brush);
 
     ODCInit::CBinaryRaster rop2(m_pDC, paint);
     
@@ -568,35 +566,35 @@ void CMswGDC::DrawEllipse(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const 
 
 void CMswGDC::DrawFilledEllipse(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &paint)
 {
-	ODCInit::SelectFillPaint(m_pDC, paint);
+    ODCInit::SelectFillPaint(m_pDC, paint);
     ODCInit::CBinaryRaster rop2(m_pDC, paint);
-	m_pDC->Ellipse(x1, y1, x2, y2);
+    m_pDC->Ellipse(x1, y1, x2, y2);
 }
 
 void CMswGDC::DrawHollowOval(int32_t xCenter, int32_t yCenter, int32_t rx, int32_t ry, int32_t h, const GDCPaint &fill_paint)
 {
-	OBrush *pBrush = ODCInit::SelectFillPaint(m_pDC, fill_paint);
+    OBrush *pBrush = ODCInit::SelectFillPaint(m_pDC, fill_paint);
     ODCInit::CBinaryRaster rop2(m_pDC, fill_paint);
 
-	if (pBrush) {
-		ORgn rgnO;
-		VERIFY(rgnO.CreateEllipticRgn(xCenter - rx, yCenter - ry, xCenter + rx, yCenter + ry));
-		ORgn rgnI;
-		VERIFY(rgnI.CreateEllipticRgn(xCenter - (rx - h), yCenter - (ry - h), xCenter + (rx - h), yCenter + (ry - h)));
-			
-		VERIFY(rgnO.CombineRgn(&rgnO, &rgnI, RGN_DIFF));
-		m_pDC->FillRgn(&rgnO, pBrush);
-	}
+    if (pBrush) {
+        ORgn rgnO;
+        VERIFY(rgnO.CreateEllipticRgn(xCenter - rx, yCenter - ry, xCenter + rx, yCenter + ry));
+        ORgn rgnI;
+        VERIFY(rgnI.CreateEllipticRgn(xCenter - (rx - h), yCenter - (ry - h), xCenter + (rx - h), yCenter + (ry - h)));
+            
+        VERIFY(rgnO.CombineRgn(&rgnO, &rgnI, RGN_DIFF));
+        m_pDC->FillRgn(&rgnO, pBrush);
+    }
 }
 
 void CMswGDC::DrawArc(int32_t x, int32_t y, const int32_t nRadius, const float fStartAngle, const float fSweepAngle, const GDCPaint &paint)
 {
-	ODCInit::SelectStrokePaint(m_pDC, paint);
+    ODCInit::SelectStrokePaint(m_pDC, paint);
     ODCInit::CBinaryRaster rop2(m_pDC, paint);
 
-	m_pDC->MoveTo(x, y);
-	::AngleArc(m_pDC->GetSafeHdc(), x, y, nRadius, fStartAngle, fSweepAngle);
-	m_pDC->LineTo(x, y);
+    m_pDC->MoveTo(x, y);
+    ::AngleArc(m_pDC->GetSafeHdc(), x, y, nRadius, fStartAngle, fSweepAngle);
+    m_pDC->LineTo(x, y);
 }
 
 void CMswGDC::TextOut(const wchar_t *sText, int32_t x, int32_t y, const GDCPaint &paint)
@@ -609,8 +607,8 @@ void CMswGDC::DrawText(const wchar_t *sText, const RECT &rect, const GDCPaint &p
 {
     ODCInit::SelectFont(m_pDC, paint);
     //Reset Font Alignment and use Alignment in the rect
-    m_pDC->SetTextAlign(TA_LEFT | TA_TOP | TA_NOUPDATECP);
-    const UINT nAlignInRect = paint.GetFontDescr()->m_nTextAlign | DT_NOCLIP | DT_SINGLELINE;
+    m_pDC->SetTextAlign(TA_LEFT|TA_TOP|TA_NOUPDATECP);
+    const UINT nAlignInRect = paint.GetFontDescr()->m_nTextAlign|DT_NOCLIP|DT_SINGLELINE;
     const int32_t nSize = (int32_t)::wcslen(sText);
     m_pDC->DrawText(sText, nSize, &rect, nAlignInRect);
 }
@@ -626,20 +624,20 @@ int32_t CMswGDC::GetTextHeight(const GDCPaint &paint) const
 
 GDCSize CMswGDC::GetTextExtent(const wchar_t *sText, size_t nCount, const GDCPaint &paint) const
 {
-	ODCInit::SelectFont(m_pDC, paint);
-	const SIZE sz = m_pDC->GetTextExtent(sText, (int32_t)nCount);
-	return GDCSize(sz.cx, sz.cy);
+    ODCInit::SelectFont(m_pDC, paint);
+    const SIZE sz = m_pDC->GetTextExtent(sText, (int32_t)nCount);
+    return GDCSize(sz.cx, sz.cy);
 }
 
 void CMswGDC::SetViewportOrg(int32_t x, int32_t y)
 {
-	m_pDC->SetViewportOrg(x, y);
+    m_pDC->SetViewportOrg(x, y);
 }
 
 GDCPoint CMswGDC::GetViewportOrg() const
 {
-	POINT pt = m_pDC->GetViewportOrg();
-	return GDCPoint(pt.x, pt.y);
+    POINT pt = m_pDC->GetViewportOrg();
+    return GDCPoint(pt.x, pt.y);
 }
 
 void CMswGDC::DrawBitmap(HBITMAP hBitmap, int32_t x, int32_t y)
@@ -658,8 +656,8 @@ CMswGDC::CMswGDC(GDCBitmap &bitmap, COLORREF background)
 {
     const int32_t width  = bitmap.Width();
     const int32_t height = bitmap.Height();
-	ASSERT(width > 0);
-	ASSERT(height > 0);
+    ASSERT(width > 0);
+    ASSERT(height > 0);
     OWindowDC dc(nullptr); // screen
     //  m_pDC->CreateCompatibleDC(&dc); does not work correctly on the delete operator exception is thrown
     // sample:
@@ -680,17 +678,21 @@ CMswGDC::CMswGDC(GDCBitmap &bitmap, COLORREF background)
 
 CMswGDC::CMswGDC(HWND hwnd)
 {
-	OWindowDC dc(nullptr); // screen
-	HDC hDC = ::CreateCompatibleDC(dc.GetSafeHdc()); 
+    OWindowDC dc(nullptr); // screen
+    HDC hDC = ::CreateCompatibleDC(dc.GetSafeHdc()); 
     m_pDC = new ODC(hDC, TRUE);
 }
 
-void CMswGDC::DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, const wchar_t *sText, bool bAllignBottom, double dEllipseAngleRad, const GDCPaint &paint)
+void CMswGDC::DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, 
+                                const wchar_t *sText, double dEllipseAngleRad, const GDCPaint &paint)
 {
-    CGdiPlusTextDrawUtils::DrawTextByEllipse(m_pDC->GetSafeHdc(), paint, dCenterAngle, nRadiusX, nRadiusY, xCenter, yCenter, sText, bAllignBottom, dEllipseAngleRad);
+    HDC hDC = m_pDC->GetSafeHdc();
+    CGdiPlusTextDrawUtils::DrawTextByEllipse(hDC, paint, dCenterAngle, nRadiusX, nRadiusY, xCenter, yCenter, sText, dEllipseAngleRad);
 }
 
-void CMswGDC::DrawTextByCircle(double dCenterAngle, int32_t nRadius, int32_t nCX, int32_t nCY, const wchar_t *sText, bool bAllignBottom, bool bRevertTextDir, const GDCPaint &paint)
+void CMswGDC::DrawTextByCircle(double dCenterAngle, int32_t nRadius, int32_t nCX, int32_t nCY, 
+                               const wchar_t *sText, bool bRevertTextDir, const GDCPaint &paint)
 {
-    CGdiPlusTextDrawUtils::DrawTextByCircle(m_pDC->GetSafeHdc(), paint, dCenterAngle, nRadius, nCX, nCY, sText, bAllignBottom, bRevertTextDir);
+    HDC hDC = m_pDC->GetSafeHdc();
+    CGdiPlusTextDrawUtils::DrawTextByCircle(hDC, paint, dCenterAngle, nRadius, nCX, nCY, sText, bRevertTextDir);
 }

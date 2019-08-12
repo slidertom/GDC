@@ -9,8 +9,8 @@ class CGdiPlusUtil
 // Static operations
 public:
     static void DrawPolygon(HDC hDC, const std::vector<POINT> &poly,
-							unsigned char init_r, unsigned char init_g, unsigned char init_b,
-							unsigned char dest_r, unsigned char dest_g, unsigned char dest_b);
+                            unsigned char init_r, unsigned char init_g, unsigned char init_b,
+                            unsigned char dest_r, unsigned char dest_g, unsigned char dest_b);
 
     static void DrawPolygonTransparent(HDC hDC, const std::vector<POINT> &poly,
                                        unsigned char alfa, unsigned char r, unsigned char g, unsigned char b);

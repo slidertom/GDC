@@ -6,7 +6,7 @@ set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "")
 set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "")
 
 get_filename_component(RootDir "${CMAKE_CURRENT_LIST_DIR}" PATH)
-#get_filename_component(RootDir "${RootDir}" PATH)
+get_filename_component(RootDir "${RootDir}" PATH)
 
 function(include_dir relativePath)
 	include_directories("${RootDir}/${relativePath}")
@@ -26,6 +26,8 @@ macro(set_project_dll_mode LibDirPath)
 	source_group(TREE ${root} FILES ${sources})
 	list(REMOVE_ITEM sources "${CMAKE_CURRENT_SOURCE_DIR}/CMakeFiles/${CMAKE_VERSION}/CompilerIdCXX/CMakeCXXCompilerId.cpp")
 	list(REMOVE_ITEM sources "${CMAKE_CURRENT_SOURCE_DIR}/CMakeFiles/${CMAKE_VERSION}/CompilerIdC/CMakeCCompilerId.c")
+	list(REMOVE_ITEM sources "${CMAKE_CURRENT_SOURCE_DIR}/CMakeFiles/feature_tests.c")
+	list(REMOVE_ITEM sources "${CMAKE_CURRENT_SOURCE_DIR}/CMakeFiles/feature_tests.cxx")
 	source_group("" FILES ${sources})
 	add_library	(${PROJECT_NAME} SHARED ${sources})
 	include_root_dir()
@@ -158,8 +160,9 @@ function(set_project_compile_options)
 		/Gy			  	# Enable function level linking
 		/Yu			  	# Use precompiled headers
 		/Zm800			# Precompiled header memory allocation limit
-		/GR				# #Enable run type information
+		/GR				# Enable run type information
         /std:c++17
+		/JMC			# Enables Just My Code stepping, which brings better debuging experience reference #32706 for more information
 	)
 	
 	target_compile_options(${PROJECT_NAME} PUBLIC  ${COMPILEOPT})	
@@ -194,8 +197,12 @@ function(set_project_definitions)
 	add_definitions(/Zi)
 
 	#Multi process compilation (currently default and cpu2 supported)
-    IF(EXISTS "${RootDir}/cpu2")
+    IF(EXISTS "${RootDir}/Tools/CMake/cpu2")
         add_definitions(/MP2)  
+    ELSEIF(EXISTS "${RootDir}/Tools/CMake/cpu3")
+        add_definitions(/MP3)  
+    ELSEIF(EXISTS "${RootDir}/Tools/CMake/cpu4")
+        add_definitions(/MP4)  
     ELSE()
         add_definitions(/MP)
 	ENDIF()

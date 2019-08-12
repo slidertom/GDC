@@ -34,8 +34,8 @@ class OFont;
 
 enum GDCRasterType
 {
-    GDC_R2_NONE = 0,
-    GDC_R2_XORPEN = 1,
+    GDC_R2_NONE      = 0,
+    GDC_R2_XORPEN    = 1,
     GDC_R2_NOTXORPEN = 2,
 };
 
@@ -45,7 +45,7 @@ enum GDCStrokeType
     GDC_PS_DASH        = 1,       /* -------  */
     GDC_PS_DOT         = 2,       /* .......  */
     GDC_PS_DASHDOT     = 3,       /* _._._._  */
-	GDC_PS_DASHDOTDOT  = 4        /* _.._.._  */
+    GDC_PS_DASHDOTDOT  = 4        /* _.._.._  */
 };
 
 enum GDCPaintType
@@ -53,19 +53,19 @@ enum GDCPaintType
     GDC_STROKE			= 0,
     GDC_FILL			= 1,
     GDC_FILL_DIAGCROSS	= 2,
-	GDC_FILL_HORIZONTAL = 3,
-	GDC_FILL_VERTICAL	= 4,
-	GDC_FILL_FDIAGONAL	= 5,
-	GDC_FILL_BDIAGONAL	= 6,
-	GDC_FILL_CROSS		= 7
+    GDC_FILL_HORIZONTAL = 3,
+    GDC_FILL_VERTICAL	= 4,
+    GDC_FILL_FDIAGONAL	= 5,
+    GDC_FILL_BDIAGONAL	= 6,
+    GDC_FILL_CROSS		= 7
 };
 
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/font-weight
 enum GDCFontWeight
 {
-	GDC_FW_LIGHT        = 300,
-	GDC_FW_NORMAL       = 400, // GDC_FW_REGULAR
-	GDC_FW_BOLD         = 700
+    GDC_FW_LIGHT        = 300,
+    GDC_FW_NORMAL       = 400, // GDC_FW_REGULAR
+    GDC_FW_BOLD         = 700
 };
 
 enum GDCFontAlign
@@ -75,14 +75,14 @@ enum GDCFontAlign
     GDC_TA_CENTER   = 4,  //  Te|xt
     GDC_TA_BOTTOM   = 8,  // __Text__
     GDC_TA_BASELINE = 16, // In text "allignement" line will be under letter "a" not on "g"
-	GDC_TA_TOP      = 32  // _______
-						  //  Text
+    GDC_TA_TOP      = 32  // _______
+                          //  Text
 };
 
 enum GDCBackgroundMode
 {
     GDC_TRANSPARENT = 1,
-    GDC_OPAQUE = 2
+    GDC_OPAQUE      = 2
 };
 
 #include "string"
@@ -90,12 +90,12 @@ enum GDCBackgroundMode
 class wxBitmap;
 class CAbsPaint;
 
-class GDC_UTIL_API GDCFontDescr
+class GDC_UTIL_API GDCFontDescr final
 {
 // Construction/Destruction
 public:
-	GDCFontDescr(const wchar_t *sFontName, GDCFontWeight weight, int32_t nHeight, int32_t nSlant, int32_t nUnderline);
-	GDCFontDescr(const GDCFontDescr &font_descr);
+    GDCFontDescr(const wchar_t *sFontName, GDCFontWeight weight, int32_t nHeight, int32_t nSlant, int32_t nUnderline);
+    GDCFontDescr(const GDCFontDescr &font_descr);
     ~GDCFontDescr() { }
 
     //Operators
@@ -109,17 +109,17 @@ public:
     GDCFontWeight m_weight {GDC_FW_NORMAL};
     int32_t m_nHeight;
     int32_t m_nSlant;
-	int32_t m_nUnderline;
+    int32_t m_nUnderline;
     int32_t m_nTextAlign;
 };
 
-class GDC_UTIL_API GDCPaint
+class GDC_UTIL_API GDCPaint final
 {
 // Construction/Destruction
 public:
     GDCPaint();
-	GDCPaint(const wchar_t *sFontName, GDCFontWeight weight, int32_t nHeight, int32_t nSlant, int32_t nUnderline);
-	GDCPaint(const GDCFontDescr &font_descr);
+    GDCPaint(const wchar_t *sFontName, GDCFontWeight weight, int32_t nHeight, int32_t nSlant, int32_t nUnderline);
+    GDCPaint(const GDCFontDescr &font_descr);
     ~GDCPaint();	
 
 // Operations
@@ -170,7 +170,7 @@ private:
     GDCBackgroundMode m_bk_mode {GDC_TRANSPARENT};
 };
 
-class GDCPoint 
+class GDCPoint final
 {
 // Construction/Destruction
 public:
@@ -182,15 +182,16 @@ public:
 // Operators
 public:
     template <class TPoint>
-    void operator=(const TPoint &pt) {
+    GDCPoint &operator=(const TPoint &pt) {
         x = pt.x;
         y = pt.y;
+        return *this;
     }
 
-	bool operator==(const GDCPoint &pt) {
-		return x == pt.x && y == pt.y;
-		return x == pt.x && y == pt.y;
-	}
+    bool operator==(const GDCPoint &pt) {
+        return x == pt.x && y == pt.y;
+        return x == pt.x && y == pt.y;
+    }
 
 // Attributes
 public:
@@ -198,7 +199,7 @@ public:
     int32_t y {0}; // maybe float or double ?
 };
 
-class GDCSize
+class GDCSize final
 {
 // Construction/Destruction
 public:
@@ -215,7 +216,7 @@ public:
 #include "vector"
 
 template <class TPoint, typename FnConversion>
-inline std::vector<GDCPoint> Poly2Gdc(const std::vector<TPoint>& src_poly, FnConversion fnConversion)
+inline std::vector<GDCPoint> Poly2Gdc(const std::vector<TPoint> &src_poly, FnConversion fnConversion)
 {
     std::vector<GDCPoint> gdc_poly;
     gdc_poly.reserve(src_poly.size());
@@ -252,7 +253,7 @@ public:
     GDC(HDC hDC);
     GDC(GDCBitmap &bitmap, COLORREF background = RGB(255, 255, 255));
     GDC(GDCSvg &svg);
-	GDC(HWND hwnd);
+    GDC(HWND hwnd);
     ~GDC();
 
 private:
@@ -279,43 +280,43 @@ public:
     void DrawPolyLine(const std::vector<GDCPoint> &points, const GDCPaint &stroke_paint);
     // special case -> avoid if statements in the general drawings
     void DrawPolygonTransparent(const std::vector<GDCPoint> &points, const GDCPaint &fill_paint);
-	void DrawPolygonGradient(const std::vector<GDCPoint> &points, const GDCPaint &paintFrom, const GDCPaint &paintTo);
-	void DrawPolygonTexture(const std::vector<GDCPoint> &points, const wchar_t * sTexturePath, double dAngle, float fZoom);
-	void DrawPolygonTexture(const std::vector<GDCPoint> &points, const std::vector<GDCPoint> &points_exclude, const wchar_t * sTexturePath, double dAngle, float fZoom);
+    void DrawPolygonGradient(const std::vector<GDCPoint> &points, const GDCPaint &paintFrom, const GDCPaint &paintTo);
+    void DrawPolygonTexture(const std::vector<GDCPoint> &points, const wchar_t * sTexturePath, double dAngle, float fZoom);
+    void DrawPolygonTexture(const std::vector<GDCPoint> &points, const std::vector<GDCPoint> &points_exclude, const wchar_t * sTexturePath, double dAngle, float fZoom);
 
     void DrawFilledRectangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &fill_paint);
     template <class TRect>
     void DrawFilledRectangle(const TRect &rect, const GDCPaint &fill_paint) {
-		DrawFilledRectangle(rect.left, rect.top, rect.right, rect.bottom, fill_paint);
-	}
+        DrawFilledRectangle(rect.left, rect.top, rect.right, rect.bottom, fill_paint);
+    }
     void DrawRectangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &stroke_paint);
     template <class TRect>
     void DrawRectangle(const TRect &rect, const GDCPaint &stroke_paint) {
-		DrawRectangle(rect.left, rect.top, rect.right, rect.bottom, stroke_paint);
-	}
+        DrawRectangle(rect.left, rect.top, rect.right, rect.bottom, stroke_paint);
+    }
     template <class TPoint> 
     void DrawRectOnPoint(const TPoint &pt, int32_t nSize, const GDCPaint &paint) {
         DrawRectangle(pt.x - nSize, pt.y - nSize, pt.x + nSize, pt.y + nSize, paint); 
     }
 
-	void DrawEllipse(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &paint);
-	template <class TRect>
-	void DrawEllipse(const TRect &rect, const GDCPaint &paint) {
-		DrawEllipse(rect.left, rect.top, rect.right, rect.bottom, paint);
-	}
-	void DrawFilledEllipse(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &paint);
-	template <class TRect>
-	void DrawFilledEllipse(const TRect &rect, const GDCPaint &paint) {
-		DrawFilledEllipse(rect.left, rect.top, rect.right, rect.bottom, paint);
-	}
-	// HollowOval http://structx.com/Shape_Formulas_035.html
-	void DrawHollowOval(int32_t xCenter, int32_t yCenter, int32_t rx, int32_t ry, int32_t h, const GDCPaint &fill_paint);
+    void DrawEllipse(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &paint);
+    template <class TRect>
+    void DrawEllipse(const TRect &rect, const GDCPaint &paint) {
+        DrawEllipse(rect.left, rect.top, rect.right, rect.bottom, paint);
+    }
+    void DrawFilledEllipse(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &paint);
+    template <class TRect>
+    void DrawFilledEllipse(const TRect &rect, const GDCPaint &paint) {
+        DrawFilledEllipse(rect.left, rect.top, rect.right, rect.bottom, paint);
+    }
+    // HollowOval http://structx.com/Shape_Formulas_035.html
+    void DrawHollowOval(int32_t xCenter, int32_t yCenter, int32_t rx, int32_t ry, int32_t h, const GDCPaint &fill_paint);
 
-	void DrawArc(int32_t x, int32_t y, const int32_t nRadius, const float fStartAngle, const float fSweepAngle, const GDCPaint &paint);
-	template <class TPoint>
-	void DrawArc(const TPoint &point, const int32_t nRadius, const float fStartAngle, const float fSweepAngle, const GDCPaint &paint) {
-		DrawArc(point.x, point.y, nRadius, fStartAngle, fSweepAngle, paint);
-	}
+    void DrawArc(int32_t x, int32_t y, const int32_t nRadius, const float fStartAngle, const float fSweepAngle, const GDCPaint &paint);
+    template <class TPoint>
+    void DrawArc(const TPoint &point, const int32_t nRadius, const float fStartAngle, const float fSweepAngle, const GDCPaint &paint) {
+        DrawArc(point.x, point.y, nRadius, fStartAngle, fSweepAngle, paint);
+    }
 
     void DrawBitmap(const GDCBitmap &bitmap, int32_t x, int32_t y); // temporal solution: HBITMAP must be replaced with the GDCBitmap
         
@@ -323,23 +324,25 @@ public:
     void TextOutRect(const wchar_t *sText, const RECT &rect, const GDCPaint &paint);
     void DrawText(const wchar_t *sText, const RECT &rect, const GDCPaint &paint);
 
-    void DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, const wchar_t *sText, bool bAllignBottom, double dEllipseAngleRad, const GDCPaint &paint);
-    void DrawTextByCircle(double dCenterAngle, int32_t nRadius, int32_t nCX, int32_t nCY, const wchar_t *sText, bool bAllignBottom, bool bRevertTextDir, const GDCPaint &paint);
+    void DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, 
+                           const wchar_t *sText, double dEllipseAngleRad, const GDCPaint &paint);
+    void DrawTextByCircle(double dCenterAngle, int32_t nRadius, int32_t nCX, int32_t nCY, 
+                          const wchar_t *sText, bool bRevertTextDir, const GDCPaint &paint);
 
     // The height (ascent + descent) of characters.
     int32_t GetTextHeight(const GDCPaint &paint) const;
     // Computes the width and height of a line of text, using the provided paint.
-	GDCSize GetTextExtent(const wchar_t *sText, size_t nCount, const GDCPaint &paint) const;
-	GDCSize GetTextExtent(const wchar_t *sText, const GDCPaint &paint) const {
+    GDCSize GetTextExtent(const wchar_t *sText, size_t nCount, const GDCPaint &paint) const;
+    GDCSize GetTextExtent(const wchar_t *sText, const GDCPaint &paint) const {
         return GetTextExtent(sText, ::wcslen(sText), paint);
     }
 
-	void SetViewportOrg(int32_t x, int32_t y);
+    void SetViewportOrg(int32_t x, int32_t y);
     template <class TPoint>
     void SetViewportOrg(const TPoint &pt) {
         SetViewportOrg(pt.x, pt.y);
     }
-	GDCPoint GetViewportOrg() const;
+    GDCPoint GetViewportOrg() const;
 
     HDC GetHDC(); // platform specific (must be used only for the transitional code)
 
@@ -352,11 +355,11 @@ private:
 };
 
 class CAbsBitmap;
-class GDC_UTIL_API GDCBitmap
+class GDC_UTIL_API GDCBitmap final
 {
 // Construction/Destruction
 public:
-	GDCBitmap(int32_t width, int32_t height);
+    GDCBitmap(int32_t width, int32_t height);
     GDCBitmap(HBITMAP hBitmap);
     ~GDCBitmap();
 
@@ -371,7 +374,7 @@ private:
     CAbsBitmap *m_pBitmap;
 };
 
-class GDC_UTIL_API GDCSvg
+class GDC_UTIL_API GDCSvg final
 {
 // Construction/Destruction
 public:

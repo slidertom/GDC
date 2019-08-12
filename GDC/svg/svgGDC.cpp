@@ -149,7 +149,8 @@ void SvgGDC::line(const char *val1, const char *val2, const char *val3, const ch
     m_pFile->write(val6);
     m_pFile->write(enter_elem());
 }
-void SvgGDC::line(const char *val1, const char *val2, const char *val3, const char *val4, const char *val5, const char *val6, const char *val7) {
+void SvgGDC::line(const char *val1, const char *val2, const char *val3, const char *val4, const char *val5, const char *val6, 
+                  const char *val7) {
     m_pFile->write(val1);
     m_pFile->write(val2);
     m_pFile->write(val3);
@@ -159,7 +160,8 @@ void SvgGDC::line(const char *val1, const char *val2, const char *val3, const ch
     m_pFile->write(val7);
     m_pFile->write(enter_elem());
 }
-void SvgGDC::line(const char *val1, const char *val2, const char *val3, const char *val4, const char *val5, const char *val6, const char *val7, const char *val8) {
+void SvgGDC::line(const char *val1, const char *val2, const char *val3, const char *val4, const char *val5, const char *val6, 
+                  const char *val7, const char *val8) {
     m_pFile->write(val1);
     m_pFile->write(val2);
     m_pFile->write(val3);
@@ -170,7 +172,8 @@ void SvgGDC::line(const char *val1, const char *val2, const char *val3, const ch
     m_pFile->write(val8);
     m_pFile->write(enter_elem());
 }
-void SvgGDC::line(const char *val1, const char *val2, const char *val3, const char *val4, const char *val5, const char *val6, const char *val7, const char *val8, const char *val9) {
+void SvgGDC::line(const char *val1, const char *val2, const char *val3, const char *val4, const char *val5, const char *val6, 
+                  const char *val7, const char *val8, const char *val9) {
     m_pFile->write(val1);
     m_pFile->write(val2);
     m_pFile->write(val3);
@@ -897,13 +900,13 @@ void SvgGDC::EndGroup()
 }
 
 void SvgGDC::DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, 
-                               const wchar_t *sText, bool bAllignBottom, double dEllipseAngleRad, const GDCPaint &paint)
+                               const wchar_t *sText, double dEllipseAngleRad, const GDCPaint &paint)
 {
     //TODO
 }
 
 void SvgGDC::DrawTextByCircle(double dCenterAngle, int32_t nRadius, int32_t nCX, int32_t nCY, const wchar_t *sText, 
-                              bool bAllignBottom, bool bRevertTextDir, const GDCPaint &paint)
+                              bool bRevertTextDir, const GDCPaint &paint)
 {
     //TODO
 }

@@ -12,7 +12,7 @@ static inline LOGFONT *CreateDefLogFont()
 {
     LOGFONT *pLF = new LOGFONT;
     ::memset(pLF, 0, sizeof(LOGFONT));
-	::wcscpy(pLF->lfFaceName, L"Arial");
+    ::wcscpy(pLF->lfFaceName, L"Arial");
     pLF->lfWeight = FW_NORMAL;
     return pLF;
 }
@@ -22,11 +22,11 @@ CMswPaint::CMswPaint(const GDCFontDescr *pFontDescr)
     m_pLF = new LOGFONT;
     ::memset(m_pLF, 0, sizeof(LOGFONT));
 
-	::wcscpy(m_pLF->lfFaceName, pFontDescr->m_sFontName.c_str());
-	m_pLF->lfHeight      = pFontDescr->m_nHeight;
-	m_pLF->lfWeight      = pFontDescr->m_weight;
+    ::wcscpy(m_pLF->lfFaceName, pFontDescr->m_sFontName.c_str());
+    m_pLF->lfHeight      = pFontDescr->m_nHeight;
+    m_pLF->lfWeight      = pFontDescr->m_weight;
     m_pLF->lfItalic      = pFontDescr->m_nSlant;
-	m_pLF->lfUnderline   = pFontDescr->m_nUnderline;
+    m_pLF->lfUnderline   = pFontDescr->m_nUnderline;
     m_pLF->lfOrientation = m_pLF->lfEscapement = (LONG)pFontDescr->m_fAngle;
 }
 
@@ -96,4 +96,3 @@ void CMswPaint::SetTextSize(int32_t nSize)
 
     m_pLF->lfHeight = nSize;
 }
-

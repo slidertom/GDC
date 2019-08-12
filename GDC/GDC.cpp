@@ -10,23 +10,19 @@
     #define new DEBUG_NEW
 #endif
 
-GDCFontDescr::GDCFontDescr(const wchar_t *sFontName, GDCFontWeight weight, int32_t nHeight, int32_t nSlant, int32_t nUnderline) {
+GDCFontDescr::GDCFontDescr(const wchar_t *sFontName, GDCFontWeight weight, int32_t nHeight, int32_t nSlant, int32_t nUnderline) 
+{
     m_sFontName  = sFontName;
     m_weight     = weight;
     m_nHeight    = nHeight;
     m_nSlant     = nSlant;
-	m_nUnderline = nUnderline;
+    m_nUnderline = nUnderline;
     m_nTextAlign = GDC_TA_LEFT;
 }
 
-GDCFontDescr::GDCFontDescr(const GDCFontDescr &font_descr) {
-    m_fAngle     = font_descr.m_fAngle;
-    m_sFontName  = font_descr.m_sFontName;
-    m_weight     = font_descr.m_weight;
-    m_nHeight    = font_descr.m_nHeight;
-    m_nSlant     = font_descr.m_nSlant;
-	m_nUnderline = font_descr.m_nUnderline;
-    m_nTextAlign = font_descr.m_nTextAlign;
+GDCFontDescr::GDCFontDescr(const GDCFontDescr &font_descr) 
+{
+    *this = font_descr;
 }
 
 GDCFontDescr &GDCFontDescr::operator=(const GDCFontDescr &x)
@@ -36,7 +32,7 @@ GDCFontDescr &GDCFontDescr::operator=(const GDCFontDescr &x)
     m_weight     = x.m_weight;
     m_nHeight    = x.m_nHeight;
     m_nSlant     = x.m_nSlant;
-	m_nUnderline = x.m_nUnderline;
+    m_nUnderline = x.m_nUnderline;
     m_nTextAlign = x.m_nTextAlign;
     return *this;
 }
@@ -53,7 +49,7 @@ GDCPaint::GDCPaint(const wchar_t *sFontName, GDCFontWeight weight, int32_t nHeig
 
 GDCPaint::GDCPaint(const GDCFontDescr &font_descr)
 {
-	m_pFontDescr  = new GDCFontDescr(font_descr);
+    m_pFontDescr  = new GDCFontDescr(font_descr);
 }
 
 GDCPaint::~GDCPaint()
@@ -137,7 +133,7 @@ void GDCPaint::SetTextSize(int32_t nSize)
     if ( m_pPaint ) {
         m_pPaint->SetTextSize(nSize);
     }
-	m_pFontDescr->m_nHeight = nSize;
+    m_pFontDescr->m_nHeight = nSize;
 }
 
 GDCPaintType GDCPaint::GetPaintType() const { return m_paint_type; }
@@ -190,7 +186,8 @@ void GDC::DrawPolygonTexture(const std::vector<GDCPoint> &points, const wchar_t 
     m_pDC->DrawPolygonTexture(points, sTexturePath, dAngle, fZoom);
 }
 
-void GDC::DrawPolygonTexture(const std::vector<GDCPoint> &points, const std::vector<GDCPoint> &points_exclude, const wchar_t * sTexturePath, double dAngle, float fZoom)
+void GDC::DrawPolygonTexture(const std::vector<GDCPoint> &points, const std::vector<GDCPoint> &points_exclude, 
+                             const wchar_t * sTexturePath, double dAngle, float fZoom)
 {
     m_pDC->DrawPolygonTexture(points, points_exclude, sTexturePath, dAngle, fZoom);
 }
@@ -222,15 +219,17 @@ void GDC::DrawEllipse(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCP
 
 void GDC::DrawFilledEllipse(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const GDCPaint &paint)
 {
-	m_pDC->DrawFilledEllipse(x1, y1, x2, y2, paint);
+    m_pDC->DrawFilledEllipse(x1, y1, x2, y2, paint);
 }
 
-void GDC::DrawHollowOval(int32_t xCenter, int32_t yCenter, int32_t rx, int32_t ry, int32_t h, const GDCPaint &fill_paint)
+void GDC::DrawHollowOval(int32_t xCenter, int32_t yCenter, int32_t rx, int32_t ry, int32_t h, 
+                         const GDCPaint &fill_paint)
 {
-	m_pDC->DrawHollowOval(xCenter, yCenter, rx, ry, h, fill_paint);
+    m_pDC->DrawHollowOval(xCenter, yCenter, rx, ry, h, fill_paint);
 }
 
-void GDC::DrawArc(int32_t x, int32_t y, const int32_t nRadius, const float fStartAngle, const float fSweepAngle, const GDCPaint &paint)
+void GDC::DrawArc(int32_t x, int32_t y, const int32_t nRadius, 
+                  const float fStartAngle, const float fSweepAngle, const GDCPaint &paint)
 {
     m_pDC->DrawArc(x, y, nRadius, fStartAngle, fSweepAngle, paint);
 }
@@ -258,14 +257,16 @@ void GDC::DrawText(const wchar_t *sText, const RECT &rect, const GDCPaint &paint
     m_pDC->DrawText(sText, rect, paint);
 }
 
-void GDC::DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, const wchar_t *sText, bool bAllignBottom, double dEllipseAngleRad, const GDCPaint &paint)
+void GDC::DrawTextByEllipse(double dCenterAngle, int32_t nRadiusX, int32_t nRadiusY, int32_t xCenter, int32_t yCenter, 
+                            const wchar_t *sText, double dEllipseAngleRad, const GDCPaint &paint)
 {
-    m_pDC->DrawTextByEllipse(dCenterAngle, nRadiusX, nRadiusY, xCenter, yCenter, sText, bAllignBottom, dEllipseAngleRad, paint);
+    m_pDC->DrawTextByEllipse(dCenterAngle, nRadiusX, nRadiusY, xCenter, yCenter, sText, dEllipseAngleRad, paint);
 }
 
-void GDC::DrawTextByCircle(double dCenterAngle, int32_t nRadius, int32_t nCX, int32_t nCY, const wchar_t *sText, bool bAllignBottom, bool bRevertTextDir, const GDCPaint &paint)
+void GDC::DrawTextByCircle(double dCenterAngle, int32_t nRadius, int32_t nCX, int32_t nCY, const wchar_t *sText, 
+                           bool bRevertTextDir, const GDCPaint &paint)
 {
-    m_pDC->DrawTextByCircle(dCenterAngle, nRadius, nCX, nCY, sText, bAllignBottom, bRevertTextDir, paint);
+    m_pDC->DrawTextByCircle(dCenterAngle, nRadius, nCX, nCY, sText, bRevertTextDir, paint);
 }
 
 int32_t GDC::GetTextHeight(const GDCPaint &paint) const
@@ -345,7 +346,7 @@ GDC::GDC(GDCBitmap &bitmap, COLORREF background /* = RGB(255, 255, 255) */)
 
 GDC::GDC(HWND hwnd)
 {
-	m_pDC = new CMswGDC(hwnd);
+    m_pDC = new CMswGDC(hwnd);
 }
 
 GDC::GDC(GDCSvg &svg)
